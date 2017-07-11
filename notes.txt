@@ -1,0 +1,233 @@
+
+text-doc for STATIC TEXT SETUP
+
+
+;ident page
+SPACE 10 IDENT SPACE 9
+SPACE 1 MODEL SPACE 8 ENG SPACE 1 RATING
+READ AC-MODEL 10 SPACE 2 READ AC-ENGRAT 12
+SPACE 1 NAV SPACE 1 DATA SPACE 9 ACTIVE
+READ NV-DCYCLE 10 SPACE 1 READ NV-ACTIVE 11
+SPACE 24
+SPACE 24
+SPACE 24
+SPACE 24
+SPACE 17 DRAG/FF
+------------------------
+PAGE <INDEX SPACE 9 PAGE POS-INIT>
+
+KEY,DESCRIPTION,SOURCE,TYPE,SPACES,JUSTIFIED
+AC-MODEL,AIRCRAFT MODEL,READ-ONCE,STRING,10,LEFT
+AC-ENGRAT,ENGINE RATING,READ-ONCE,STRING,12,RIGHT
+NV-DCYCLE,NAVIGATION DATA,READ-ONCE,STRING,10,LEFT
+NV-DEFF,NAV DATA EFFECTIVE DATE,READ-ONCE,STRING,13,RIGHT
+
+
+format string
+
+
+
+
+
+Features to Implement
+
+-Warning Messages
+***NAV DATA OUT OF DATE 
+***ROUTE 1 UPLINK READY
+
+
+Design
+-click on side button, returns position
+
+load preset with formatting strings
+placeholder
+loading 
+
+Load from Objects::  XX (CHAR) OR ## (NUM)
+Placeholder Texts::  ▯▯
+
+
+
+
+
+
+
+Screens Mock Ups
+
+
+Aircraft & Nav Ident Page
+__________________________
+|          IDENT         |
+| MODEL        ENG RATING|      -click on side button, returns position 
+|XXXXXXXXXX  XXXXXXXXXXXX|
+| NAV DATA         ACTIVE|
+|AIRAC-1601 JAN07FEB03/16|
+|                        |
+|                        |
+|                        |
+|                        |
+|                 DRAG/FF| 
+|               +0.0/+0.0|
+|------------------------|
+|<INDEX         POS INIT>|
+|________________________|
+
+
+Position Init
+__________________________
+|        POS INIT    1/3 |
+|                LAST POS|
+|      N48D36.1 W123D01.1|
+| REF AIRPORT            |
+|                        |
+| GATE                   |
+|                        |
+| UTC             GPS POS|
+|2030Z N48D36.2 W123D01.2|
+|        SET INERTIAL POS|
+|                        | 
+|------------------------|
+|<INDEX            ROUTE>|
+|________________________|
+
+
+
+Route Init
+__________________________
+|      RTE 1         1/2 |
+| ORIGIN             DEST|
+|▯▯▯▯                ▯▯▯▯|
+| RUNWAY          FLT NO |
+|             -----------|
+| ROUTE          CO ROUTE|
+|<REQUEST     -----------|
+|                        |
+|                        |
+| ROUTE -----------------|
+|<SAVE              ALTN>| 
+|                        |
+|<RTE 2         ACTIVATE>|
+|________________________|
+__________________________
+|      RTE 1         1/2 |
+| ORIGIN             DEST|
+|KIAH                PHNL|
+| RUNWAY          FLT NO |
+|RW-----      -----------|
+| ROUTE          CO ROUTE|
+|<REQUEST     -----------|
+|                        |
+|                        |
+| ROUTE -----------------|
+|<SAVE              ALTN>| 
+|                        |
+|<RTE 2         ACTIVATE>|
+|________________________|
+
+
+Route Legs
+__________________________
+|      RTE 1 LEGS    1/5 |
+| 277°    158NM          |
+|CRGER        ----/------|
+| 280°    417NM          |
+|EWM          ----/------|
+| 278°     70NM          |
+|DMN          ----/------|
+| 277°     68NM          |
+|WOBUG        ----/------|
+| 279°    163NM          | 
+|PXR          ----/------|
+|------------------------|
+|<RTE 2 LEGS    ACTIVATE>|
+|________________________|
+
+
+
+DEPARTURE/ARRIVAL INDEX
+
+__________________________
+|      DEP/ARR INDEX     |
+|        RTE 1           |
+|<DEP      KIAH      ARR>|
+|                        |
+|          PHNL      ARR>|
+|--------RTE 2 ----------|
+|                        |
+|                        |
+|                        |
+|------------------------|
+|                        | 
+| DEP                 ARR|
+|<----              ---->|
+|________________________|
+
+
+
+PREF INIT
+__________________________
+|       PREF INIT        |
+| GR WT           CRZ ALT|
+|###.#              FL###|
+| FUEL         COST INDEX|
+|###.#LB CALC          ##|
+| ZFW       MIN FUEL TEMP|
+|###.#              -## C|
+| RESERVES         CRZ CG|
+|###.#              ##.#%|
+|PREF INIT      STEP SIZE|
+|<REQUEST            RVSM| 
+|------------------------|
+|<INDEX       THRUST LIM>|
+|________________________|
+
+
+THRUST LIM
+__________________________
+|       THRUST LIM       |
+| SEL      OAT     TO  N1|
+|---       15 C     ###.#|
+|                        |
+|<TO   <SEL><ARM>    CLB>|
+| TO 1                   |
+|<-10%             CLB 1>|
+| TO 2                   |
+|<-20%             CLB 2>|
+|                        |
+|                        | 
+|------------------------|
+|<INDEX          TAKEOFF>|
+|________________________|
+
+
+
+
+
+
+
+
+
+
+
+
+
+--------UPLINK-------------
+
+
+PREF INIT
+__________________________
+|       PREF INIT        |
+| GR WT           CRZ ALT|
+|###.#              FL###|
+| FUEL         COST INDEX|
+|###.#LB CALC          ##|
+| ZFW       MIN FUEL TEMP|
+|###.#              -## C|
+| RESERVES         CRZ CG|
+|###.#              ##.#%|
+|     PREF INIT DATA     |
+|<REJECT          ACCEPT>| 
+|------------------------|
+|<INDEX       THRUST LIM>|
+|PREF INIT UPLINK________|
+
