@@ -5,16 +5,12 @@ import java.io.FileNotFoundException;
 class Page {
   String title;
   char[][] screen;
-  Aircraft ac;
-  Navigation nv;
-  World wr;
+  DataInterface bridge;
   final int ROW_SIZE = 14;
   final int COL_SIZE = 24;
 
-  public Page(String title, Aircraft ac, Navigation nv, World wr) throws FileNotFoundException{
-    this.ac = ac;
-    this.nv = nv;
-    this.wr = wr;
+  public Page(String title, DataInterface bridge) throws FileNotFoundException{
+    this.bridge = bridge; 
     this.title = title;
     screen = new char[ROW_SIZE][COL_SIZE];
     fillWithSpace();
@@ -74,19 +70,7 @@ class Page {
   }
 
   private String getValue(String key, int maxSpaces, int col) {
-    String ret = retreiveValueFromHash(key);
-    return formatValueString(ret, maxSpaces, col);
-  }
-
-  private String retreiveValueFromHash(String key) {
-    if (key.startsWith("AC-") && ac.attributes.containsKey(key))
-      return ac.attributes.get(key);
-    else if (key.startsWith("NV-") && nv.attributes.containsKey(key))
-      return nv.attributes.get(key);
-    else if (key.startsWith("WR-") && wr.attributes.containsKey(key))
-      return wr.attributes.get(key);
-    else
-      return "-ERR";
+    return formatValueString(bridge.getValueFor(key), maxSpaces, col);
   }
 
   private String formatValueString(String s, int maxSpaces, int col) {
@@ -103,7 +87,7 @@ class Page {
   }
 
   /**
-  *   returns index, a new position on along the screen
+  *   returns index, a new position along the screen
   */
   private int fillRow(int row, int col, char fill, int times) {
     for (int i = 0; i < times; i++) 

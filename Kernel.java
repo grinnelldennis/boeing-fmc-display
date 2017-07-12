@@ -6,10 +6,12 @@ class Kernel {
     Navigation nv = new Navigation();
     World wr = new World();
 
-    Page ident = new Page("Ident", ac, nv, wr);
+    DataInterface br = new DataInterface(ac, nv, wr);
+
+    Page ident = new Page("Ident", br);
     ident.renderScreen();
 
-    Page posInit = new Page("Pos-Init", ac, nv, wr);
+    Page posInit = new Page("Pos-Init", br);
     posInit.renderScreen();
   }
 }
