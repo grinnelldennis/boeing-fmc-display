@@ -12,8 +12,11 @@ class Kernel {
     HashMap<String, Page> screens = new HashMap<>();
     screens.put("IDENT", new Page("Ident", br));
     screens.put("POS-INIT", new Page("Pos-Init", br));
-    screens.put("RTE1", new Page("Route", br));
+    screens.put("ROUTE", new Page("Route", br));
 
-    System.out.println(screens.get("IDENT").openPage());
+    String currentScreen = "IDENT";
+    while (screens.containsKey(currentScreen)) 
+      currentScreen = screens.get(currentScreen).openPage();
+    System.out.println(currentScreen + " not found.");
   }
 }
