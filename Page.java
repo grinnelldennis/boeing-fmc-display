@@ -76,11 +76,19 @@ class Page {
           System.out.println("::read. ");                  //DEBUG
           col = fillRow(row, col, getValue(parts[i++], Integer.parseInt(parts[i]), col));
           break;
-        case "INPUT":
-          //TODO: Deal with Fields Pending of Inputs
-          col = fillRow(row, col, 'I', Integer.parseInt(parts[i+=1]));
+        case "IN-ESS":    //"Essential" Inputs, shows up as Vertical Boxes
+          //TODO: Deal with Fields Awaiting Inputs
+          col = fillRow(row, col, '0', Integer.parseInt(parts[i+=1]));
           break;
-        case "PRINTW":
+        case "IN-OPT":    //"Optional" Inputs, shows up as Dashes
+          //TODO: Deal with Fields Awaiting Inputs
+          col = fillRow(row, col, '-', Integer.parseInt(parts[i+=1]));
+          break;
+        case "IN-BNK":    //"Blank" Inputs, shows up as Blanks
+          //TODO: Deal with Fields Awaiting Inputs
+          col = fillRow(row, col, ' ', Integer.parseInt(parts[i+=1]));
+          break;
+        case "PRINT":
           System.out.println("::print. " + parts[i]);     //debug
           col = fillRow(row, col, parts[i]);
           break;

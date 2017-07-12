@@ -9,9 +9,9 @@ class Kernel {
     DataInterface br = new DataInterface(ac, nv, wr);
 
     Page ident = new Page("Ident", br);
-    ident.renderScreen();
+    ident.renderToScreen();
 
     Page posInit = new Page("Pos-Init", br);
-    posInit.renderScreen();
+    posInit.renderToScreen();
   }
 }
