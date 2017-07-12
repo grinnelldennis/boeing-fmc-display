@@ -47,7 +47,7 @@ class Page {
 
   // model button presses & typed-inputs
   public String inputListener() {
-    String input = scan.nextLine();
+    String input = scan.nextLine().toUpperCase();
     while (!isAButtonPress(input)) { 
       fillRow(13, 0, ' ', 24);
       String[] inputs = input.split(" "); 
@@ -60,7 +60,7 @@ class Page {
       else
         fillRow(13, 0, "INVALID COMMAND");
       updateScreen();
-      input = scan.nextLine();
+      input = scan.nextLine().toUpperCase();
     } 
     return buttons.get(input);
   }
@@ -85,12 +85,18 @@ class Page {
   * Renders 2d array to screen
   */
   public void renderToScreen () {
-    System.out.println("__________________________");
+    System.out.println("______________________________");
     for (int x = 0; x < ROW_SIZE; x++) {
-      System.out.print("|");
+      if (x % 2 == 0 && x != 0)
+        System.out.print(" -|");
+      else
+        System.out.print("  |");
       for (int y = 0; y < COL_SIZE; y++) 
         System.out.print(screen[x][y]);
-      System.out.print("| (" + x + ")\n");
+      if (x % 2 == 0 && x != 0)
+        System.out.print("|- (" + x + ")\n");
+      else
+        System.out.print("|  (" + x + ")\n");
     }
   }
 
@@ -122,7 +128,7 @@ class Page {
     int spaces, col = 0;
     String[] parts = line.split(" ");
     for (int i = 0; i < parts.length; i++) {
-      //System.out.println("::read. " + parts[i]);     //debug
+      System.out.println("::reading.. " + parts[i] + parts[i+1]);     //debug
       switch (parts[i++]) {
         case "SPACE":
           col = fillRow(row, col, ' ', Integer.parseInt(parts[i]));
@@ -160,6 +166,9 @@ class Page {
   }
 
   private int processButton(int row, int col, String part) {
+    String[] parts = part.split("/");
+    if (parts.length == 2)
+      part = parts[0] + " " + parts[1];
     if (col == 0) 
       buttons.put(getPosition(row, col), part.substring(1));
     else
