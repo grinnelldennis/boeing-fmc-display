@@ -7,21 +7,31 @@ class Page {
   char[][] screen;
   Aircraft ac;
   Navigation nv;
+  World wr;
+  final int ROW_SIZE = 14;
+  final int COL_SIZE = 24;
 
-  public Page(String title, Aircraft ac, Navigation nv) throws FileNotFoundException{
+  public Page(String title, Aircraft ac, Navigation nv, World wr) throws FileNotFoundException{
     this.ac = ac;
     this.nv = nv;
+    this.wr = wr;
     this.title = title;
-    screen = new char[14][24];
-    Scanner fscan = new Scanner(new File("./"+title+".txt"));
+    screen = new char[ROW_SIZE][COL_SIZE];
+    fillWithSpace();
+    Scanner fscan = new Scanner(new File("./pages/"+title+".txt"));
     populateArray(fscan);
+  }
+
+  private void fillWithSpace() {
+    for (int x = 0; x < ROW_SIZE; x++)
+      fillRow(x, 0, ' ', COL_SIZE);
   }
 
   public void renderScreen () {
     System.out.println(" ________________________");
-    for (int x = 0; x < 14; x++) {
+    for (int x = 0; x < ROW_SIZE; x++) {
       System.out.print("|");
-      for (int y = 0; y < 24; y++) 
+      for (int y = 0; y < COL_SIZE; y++) 
         System.out.print(screen[x][y]);
       System.out.print("|\n");
     }
@@ -48,8 +58,12 @@ class Page {
           col = fillRow(row, col, ' ', Integer.parseInt(parts[i]));
           break;
         case "READ":
-          System.out.println("::read. ");
+          System.out.println("::read. ");                  //DEBUG
           col = fillRow(row, col, getValue(parts[i++], Integer.parseInt(parts[i]), col));
+          break;
+        case "INPUT":
+          //TODO: Deal with Fields Pending of Inputs
+          col = fillRow(row, col, 'I', Integer.parseInt(parts[i+=1]));
           break;
         case "PRINTW":
           System.out.println("::print. " + parts[i]);     //debug
@@ -69,6 +83,8 @@ class Page {
       return ac.attributes.get(key);
     else if (key.startsWith("NV-") && nv.attributes.containsKey(key))
       return nv.attributes.get(key);
+    else if (key.startsWith("WR-") && wr.attributes.containsKey(key))
+      return wr.attributes.get(key);
     else
       return "-ERR";
   }
@@ -92,14 +108,14 @@ class Page {
   private int fillRow(int row, int col, char fill, int times) {
     for (int i = 0; i < times; i++) 
       screen[row][col++] = fill;
-    renderScreen();
+    //renderScreen();         //DEBUG
     return col;
   }
 
   private int fillRow(int row, int col, String fill) {
     for (char c: fill.toCharArray()) 
       screen[row][col++] = c;
-    renderScreen();
+    //renderScreen();         //DEBUG
     return col;
   }
 
