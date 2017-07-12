@@ -8,11 +8,11 @@ class Aircraft {
     this.aircraft = aircraft;
     attributes = new HashMap<>();
     loadAttributes();
+    System.out.println ("Aircraft contains " + attributes.size() + " items.");
   }
 
   public void loadAttributes() {
     attributes.put("AC-MODEL", "777-200.2");
-    attributes.put("AC-ENGRAT", "GE90-110B1L");
-    System.out.println ("Aircraft HashMap contains " + attributes.size() + " items.");
+    attributes.put("AC-ENGRAT", "GE90-110B1L2");
   }
 }
