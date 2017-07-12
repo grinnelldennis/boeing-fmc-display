@@ -35,7 +35,7 @@ class Page {
       System.out.print("|");
       for (int y = 0; y < COL_SIZE; y++) 
         System.out.print(screen[x][y]);
-      System.out.print("|\n");
+      System.out.print("| (" + x + ")\n");
     }
   }
 
@@ -67,13 +67,12 @@ class Page {
     int col = 0;
     String[] parts = line.split(" ");
     for (int i = 0; i < parts.length; i++) {
+      //System.out.println("::read. " + parts[i]);     //debug
       switch (parts[i++]) {
         case "SPACE":
-          System.out.println("::spaces. " + parts[i]);     //debug
           col = fillRow(row, col, ' ', Integer.parseInt(parts[i]));
           break;
         case "READ":
-          System.out.println("::read. ");                  //DEBUG
           col = fillRow(row, col, getValue(parts[i++], Integer.parseInt(parts[i]), col));
           break;
         case "IN-ESS":    //"Essential" Inputs, shows up as Vertical Boxes
@@ -89,7 +88,6 @@ class Page {
           col = fillRow(row, col, ' ', Integer.parseInt(parts[i+=1]));
           break;
         case "PRINT":
-          System.out.println("::print. " + parts[i]);     //debug
           col = fillRow(row, col, parts[i]);
           break;
       }

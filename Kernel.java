@@ -13,5 +13,10 @@ class Kernel {
 
     Page posInit = new Page("Pos-Init", br);
     posInit.renderToScreen();
+
+    Page route1 = new Page("Route", br);
+    route1.renderToScreen();
+
+     
   }
 }
