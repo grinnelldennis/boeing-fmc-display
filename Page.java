@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.util.HashMap;
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -8,15 +9,43 @@ class Page {
   DataInterface bridge;
   final int ROW_SIZE = 14;
   final int COL_SIZE = 24;
+  Scanner scan;
+  HashMap<String, String> buttons;
 
   public Page(String title, DataInterface bridge) throws FileNotFoundException{
     this.bridge = bridge; 
     this.title = title;
+    scan = new Scanner(System.in);
+    buttons = new HashMap<>();
     screen = new char[ROW_SIZE][COL_SIZE];
+
     fillWithSpace();
     Scanner fscan = new Scanner(new File("./pages/"+title+".txt"));
     parseFile(fscan);
+
+    //LOAD DEBUG
+    System.out.println("Page contains " + buttons.size() + " buttons.");
   }
+
+  public String openPage() {
+    renderToScreen();
+    return inputListener();
+  }
+
+  // model button presses & typed-inputs
+  public String inputListener() {
+    String input = scan.nextLine();
+    while (input.length() > 3) {
+      System.out.println ("Input greater than 3.");
+      //parse input
+      input = scan.nextLine();
+    } 
+    if (buttons.containsKey(input))
+      return buttons.get(input);
+    else
+      return "-ERR";
+  }
+
 
   /**
   * Initializes the 2d array with whitespaces
@@ -90,8 +119,21 @@ class Page {
         case "PRINT":
           col = fillRow(row, col, parts[i]);
           break;
+        case "BUTTON":
+          col = processButton(row, col, parts[i]);
+          break;
       }
     }
+  }
+
+  private int processButton(int row, int col, String part) {
+    Boolean leftJustified = (col==0);
+    String pos = row + ((leftJustified)? "L" : "R");
+    if (leftJustified)
+      buttons.put(pos, part.substring(1));
+    else
+      buttons.put(pos, part.substring(0, part.length()-1));
+    return fillRow(row, col, part);
   }
 
   /**
@@ -142,7 +184,6 @@ class Page {
   private int fillRow(int row, int col, char fill, int times) {
     for (int i = 0; i < times; i++) 
       screen[row][col++] = fill;
-    //renderScreen();         //DEBUG
     return col;
   }
 
@@ -158,7 +199,6 @@ class Page {
   private int fillRow(int row, int col, String fill) {
     for (char c: fill.toCharArray()) 
       screen[row][col++] = c;
-    //renderScreen();         //DEBUG
     return col;
   }
 

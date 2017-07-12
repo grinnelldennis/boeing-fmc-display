@@ -1,4 +1,5 @@
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 
 class Kernel {
   public static void main(String[] args) throws FileNotFoundException{
@@ -8,15 +9,11 @@ class Kernel {
 
     DataInterface br = new DataInterface(ac, nv, wr);
 
-    Page ident = new Page("Ident", br);
-    ident.renderToScreen();
+    HashMap<String, Page> screens = new HashMap<>();
+    screens.put("IDENT", new Page("Ident", br));
+    screens.put("POS-INIT", new Page("Pos-Init", br));
+    screens.put("RTE1", new Page("Route", br));
 
-    Page posInit = new Page("Pos-Init", br);
-    posInit.renderToScreen();
-
-    Page route1 = new Page("Route", br);
-    route1.renderToScreen();
-
-     
+    System.out.println(screens.get("IDENT").openPage());
   }
 }

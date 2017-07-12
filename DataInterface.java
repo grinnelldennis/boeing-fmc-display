@@ -29,4 +29,8 @@ class DataInterface {
       return "-ERR";
   }
 
+  public void writeTo(String key, String value) {
+    
+  }
+
 }
