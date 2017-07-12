@@ -15,15 +15,21 @@ class Page {
     screen = new char[ROW_SIZE][COL_SIZE];
     fillWithSpace();
     Scanner fscan = new Scanner(new File("./pages/"+title+".txt"));
-    populateArray(fscan);
+    parseFile(fscan);
   }
 
+  /**
+  * Initializes the 2d array with whitespaces
+  */
   private void fillWithSpace() {
     for (int x = 0; x < ROW_SIZE; x++)
       fillRow(x, 0, ' ', COL_SIZE);
   }
 
-  public void renderScreen () {
+  /**
+  * Renders 2d array to screen
+  */
+  public void renderToScreen () {
     System.out.println(" ________________________");
     for (int x = 0; x < ROW_SIZE; x++) {
       System.out.print("|");
@@ -33,7 +39,13 @@ class Page {
     }
   }
 
-  private void populateArray(Scanner fscan) {
+  /**
+  * Takes a file of text that represents a fmc screen and parse the 
+  *   instructions from the text file. Ignores comment lines and calls
+  *   parseLine to parse each individual lines
+  * @param fscan, an open file Scanner
+  */
+  private void parseFile(Scanner fscan) {
     int rowIndex = 0;
     while (fscan.hasNext()) {
       String line = fscan.nextLine();
@@ -42,8 +54,15 @@ class Page {
         rowIndex++;
       }
     }
+    fscan.close();
   }
 
+  /**
+  * Takes a line of text that represents a line on the fmc and parse the 
+  *   instructions from the text file. Is able to parse keywords
+  * @param line, line of text from instruction file
+  * @param row, row to write into 
+  */
   private void parseLine(String line, int row) {
     int col = 0;
     String[] parts = line.split(" ");
@@ -69,10 +88,28 @@ class Page {
     }
   }
 
+  /**
+  * Calls bridge to get neceessary information to display on screen and format
+  *   such value.
+  * @param key, String to recover value for from bridge
+  * @param maxSpaces, maximum length allocated for s on screen
+  * @param col, an integer
+  * @return a String from bridge formatted by formatValueString
+  * @see formatValueString()
+  */
   private String getValue(String key, int maxSpaces, int col) {
     return formatValueString(bridge.getValueFor(key), maxSpaces, col);
   }
 
+  /**
+  * Formats String s to fit into maxSpaces. Col determines whether formatted
+  *   String is right or left justified by if necessary prepending or appending
+  *   s with white spaces.
+  * @param s, string to be formatted
+  * @param maxSpaces, maximum length allocated for s on screen
+  * @param col, left jusitifed if col equals 0
+  * @return formatted string ready for fillScreen()
+  */
   private String formatValueString(String s, int maxSpaces, int col) {
     String spaces = "";
     if (s.length() < maxSpaces)  {
@@ -87,7 +124,14 @@ class Page {
   }
 
   /**
-  *   returns index, a new position along the screen
+  * Fills FMC screen with character fill "times", starting from col on row
+  *   by overwriting the existing character on the 2D array 
+  * e.g. writing whitespaces 6 times
+  * @param row, target row
+  * @param col, target col
+  * @param fill, fill for target [row][col]
+  * @param times, number of times to fill with character
+  * @return col, incremented position along the screen
   */
   private int fillRow(int row, int col, char fill, int times) {
     for (int i = 0; i < times; i++) 
@@ -96,6 +140,15 @@ class Page {
     return col;
   }
 
+  /**
+  * Fills FMC screen with string "fill", starting from col on row
+  *   by overwriting the existing character on the 2D array 
+  * e.g. writing "POS INIT" to screen
+  * @param row, target row
+  * @param col, target col
+  * @param fill, fill for target [row][col]
+  * @return col, incremented position along the screen
+  */
   private int fillRow(int row, int col, String fill) {
     for (char c: fill.toCharArray()) 
       screen[row][col++] = c;
