@@ -29,8 +29,8 @@ class DataInterface {
       return "-ERR";
   }
 
-  public void writeTo(String key, String value) {
-    
+  public boolean writeTo(String key, String value) {
+    return true;
   }
 
 }

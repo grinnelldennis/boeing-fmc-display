@@ -10,21 +10,34 @@ class Page {
   final int ROW_SIZE = 14;
   final int COL_SIZE = 24;
   Scanner scan;
-  HashMap<String, String> buttons;
+  HashMap<String, String> buttons;      //<screenLocation, buttonId>
+  HashMap<String, Field> fields;       //<screenLocation, fieldId>
+
+  private class Field{
+    String fieldId;
+    int maxSpaces;
+    int startRow;
+    int startCol;
+    public Field(String fieldId, int maxSpaces, int r, int c) {
+      this.fieldId = fieldId; this.maxSpaces = maxSpaces; 
+      this.startRow = r; this.startCol = c;
+    }
+  }
 
   public Page(String title, DataInterface bridge) throws FileNotFoundException{
     this.bridge = bridge; 
     this.title = title;
     scan = new Scanner(System.in);
+    fields = new HashMap<>();
     buttons = new HashMap<>();
     screen = new char[ROW_SIZE][COL_SIZE];
 
     fillWithSpace();
     Scanner fscan = new Scanner(new File("./pages/"+title+".txt"));
     parseFile(fscan);
-
     //LOAD DEBUG
     System.out.println("Page contains " + buttons.size() + " buttons.");
+    System.out.println("Page contains " + fields.size() + " fields.");
   }
 
   public String openPage() {
@@ -35,17 +48,30 @@ class Page {
   // model button presses & typed-inputs
   public String inputListener() {
     String input = scan.nextLine();
-    while (input.length() > 3) {
-      System.out.println ("Input greater than 3.");
-      //parse input
+    while (!isAButtonPress(input)) { 
+      fillRow(13, 0, ' ', 24);
+      String[] inputs = input.split(" "); 
+      if (inputs.length == 2 && fields.containsKey(inputs[0]))
+        if (bridge.writeTo(fields.get(inputs[0]).fieldId, inputs[1])) {
+          Field fill = fields.get(inputs[0]);
+          fillRow(fill.startRow, fill.startCol, 
+            formatValueString(inputs[1], fill.maxSpaces, fill.startCol)); 
+        }
+      else
+        fillRow(13, 0, "INVALID COMMAND");
+      updateScreen();
       input = scan.nextLine();
     } 
-    if (buttons.containsKey(input))
-      return buttons.get(input);
-    else
-      return "-ERR";
+    return buttons.get(input);
   }
 
+  private void updateScreen() {
+    renderToScreen();
+  }
+
+  private boolean isAButtonPress(String input) {
+    return buttons.containsKey(input);  
+  }
 
   /**
   * Initializes the 2d array with whitespaces
@@ -59,7 +85,7 @@ class Page {
   * Renders 2d array to screen
   */
   public void renderToScreen () {
-    System.out.println(" ________________________");
+    System.out.println("__________________________");
     for (int x = 0; x < ROW_SIZE; x++) {
       System.out.print("|");
       for (int y = 0; y < COL_SIZE; y++) 
@@ -93,7 +119,7 @@ class Page {
   * @param row, row to write into 
   */
   private void parseLine(String line, int row) {
-    int col = 0;
+    int spaces, col = 0;
     String[] parts = line.split(" ");
     for (int i = 0; i < parts.length; i++) {
       //System.out.println("::read. " + parts[i]);     //debug
@@ -105,16 +131,19 @@ class Page {
           col = fillRow(row, col, getValue(parts[i++], Integer.parseInt(parts[i]), col));
           break;
         case "IN-ESS":    //"Essential" Inputs, shows up as Vertical Boxes
-          //TODO: Deal with Fields Awaiting Inputs
-          col = fillRow(row, col, '0', Integer.parseInt(parts[i+=1]));
+          spaces = Integer.parseInt(parts[i+1]);
+          fields.put(getPosition(row, col), new Field(parts[i++], spaces, row, col));
+          col = fillRow(row, col, '0',spaces);
           break;
         case "IN-OPT":    //"Optional" Inputs, shows up as Dashes
-          //TODO: Deal with Fields Awaiting Inputs
-          col = fillRow(row, col, '-', Integer.parseInt(parts[i+=1]));
+          spaces = Integer.parseInt(parts[i+1]);
+          fields.put(getPosition(row, col), new Field(parts[i++], spaces, row, col));
+          col = fillRow(row, col, '-', spaces);
           break;
         case "IN-BNK":    //"Blank" Inputs, shows up as Blanks
-          //TODO: Deal with Fields Awaiting Inputs
-          col = fillRow(row, col, ' ', Integer.parseInt(parts[i+=1]));
+          spaces = Integer.parseInt(parts[i+1]);
+          fields.put(getPosition(row, col), new Field(parts[i++], spaces, row, col));
+          col = fillRow(row, col, ' ', spaces);
           break;
         case "PRINT":
           col = fillRow(row, col, parts[i]);
@@ -126,13 +155,15 @@ class Page {
     }
   }
 
+  private String getPosition(int row, int col) {
+    return "" + row + ((col==0)? "L" : "R");
+  }
+
   private int processButton(int row, int col, String part) {
-    Boolean leftJustified = (col==0);
-    String pos = row + ((leftJustified)? "L" : "R");
-    if (leftJustified)
-      buttons.put(pos, part.substring(1));
+    if (col == 0) 
+      buttons.put(getPosition(row, col), part.substring(1));
     else
-      buttons.put(pos, part.substring(0, part.length()-1));
+      buttons.put(getPosition(row, col), part.substring(0, part.length()-1));
     return fillRow(row, col, part);
   }
 
