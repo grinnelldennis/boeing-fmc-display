@@ -13,17 +13,6 @@ class Page {
   HashMap<String, String> buttons;      //<screenLocation, buttonId>
   HashMap<String, Field> fields;       //<screenLocation, fieldId>
 
-  private class Field{
-    String fieldId;
-    int maxSpaces;
-    int startRow;
-    int startCol;
-    public Field(String fieldId, int maxSpaces, int r, int c) {
-      this.fieldId = fieldId; this.maxSpaces = maxSpaces; 
-      this.startRow = r; this.startCol = c;
-    }
-  }
-
   public Page(String title, DataInterface bridge) throws FileNotFoundException{
     this.bridge = bridge; 
     this.title = title;
@@ -31,7 +20,7 @@ class Page {
     fields = new HashMap<>();
     buttons = new HashMap<>();
     screen = new char[ROW_SIZE][COL_SIZE];
-
+    //INIT PAGE
     fillWithSpace();
     Scanner fscan = new Scanner(new File("./pages/"+title+".txt"));
     parseFile(fscan);
@@ -48,15 +37,11 @@ class Page {
   // model button presses & typed-inputs
   public String inputListener() {
     String input = scan.nextLine().toUpperCase();
-    while (!isAButtonPress(input)) { 
-      fillRow(13, 0, ' ', 24);
+    while (!isAButtonPress(input)) {
+      clearRow(13);
       String[] inputs = input.split(" "); 
       if (inputs.length == 2 && fields.containsKey(inputs[0]))
-        if (bridge.writeToFmc(fields.get(inputs[0]).fieldId, inputs[1])) {
-          Field fill = fields.get(inputs[0]);
-          fillRow(fill.startRow, fill.startCol, 
-            formatValueString(inputs[1], fill.maxSpaces, fill.startCol)); 
-        }
+        screen = bridge.readInput(inputs[0], fields.get(inputs[0]).fieldId, inputs[1], screen, fields);
       else
         fillRow(13, 0, "INVALID COMMAND");
       updateScreen();
@@ -80,6 +65,10 @@ class Page {
   private void fillWithSpace() {
     for (int x = 0; x < ROW_SIZE; x++)
       fillRow(x, 0, ' ', COL_SIZE);
+  }
+
+  private void clearRow(int r) {
+    fillRow(r, 0, ' ', COL_SIZE);
   }
 
   /**
