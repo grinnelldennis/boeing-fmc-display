@@ -124,10 +124,10 @@ class DataInterface {
   private boolean parseInformation(String key, String value){
     switch(key) {
       case "AIRPORT":
-        if (airportExists(value))
-          System.out.println(""+ nd.airports.get(value).runways.get(0).coord.latitude + 
-            nd.airports.get(value).runways.get(0).coord.longitude);
-        break;
+        if (airportExists(value)) {
+          writeToRowOnScreen(4, 6, formatValueString(nd.airports.get(value).runways.get(1).coord.getLatNSDot(), 8, 1)); 
+          writeToRowOnScreen(4, 15, formatValueString(nd.airports.get(value).runways.get(1).coord.getLonEWDot(), 9, 1));
+        } break;
     }
     return true;
   }
