@@ -11,11 +11,15 @@ class DataInterface {
   Aircraft ac;
   Navigation nv;
   World wr;
+  NavigationDatabase nd;
+  FlightPlan fp;
 
-  public DataInterface(Aircraft ac, Navigation nv, World wr) {
+  public DataInterface(Aircraft ac, Navigation nv, World wr, NavigationDatabase nd, FlightPlan fp) {
     this.ac = ac;
     this.nv = nv;
     this.wr = wr;
+    this.nd = nd;
+    this.fp = fp;
   }
 
   public String getValueFor(String key) {
@@ -29,8 +33,46 @@ class DataInterface {
       return "-ERR";
   }
 
-  public boolean writeTo(String key, String value) {
+  public boolean writeToFmc(String key, String value) {
+    System.out.println ("writeToFmc() " + key + " " + value);
+    String[] keys = key.split("-");
+    return parseKey(keys[0], keys[1], value);
+  }
+
+  private boolean parseKey(String category, String key, String value) {
+    System.out.println ("parseKey " + key + " " + value);
+    switch(category) {
+      case "FP":
+        return parseFlightPlan(key, value);
+      case "I":
+        return false;
+      default:
+        return false;
+    } 
+    // return false;
+  }
+
+  private boolean parseFlightPlan(String key, String value) {
+    switch(key) {
+      case "ORGNARPT":
+        if (airportExists(value))
+          fp.setOrigin(nd.airports.get(value));
+        break;
+      case "DESTARPT":
+        if (airportExists(value))
+          fp.setDestination(nd.airports.get(value));
+        break;
+      case "FLTNO":
+          fp.setFlightNumber(value);
+        break;
+      default:
+        return false;
+    }
     return true;
+  }
+
+  private boolean airportExists(String icao) {
+    return nd.airports.containsKey(icao);
   }
 
 }

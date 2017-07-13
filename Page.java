@@ -52,7 +52,7 @@ class Page {
       fillRow(13, 0, ' ', 24);
       String[] inputs = input.split(" "); 
       if (inputs.length == 2 && fields.containsKey(inputs[0]))
-        if (bridge.writeTo(fields.get(inputs[0]).fieldId, inputs[1])) {
+        if (bridge.writeToFmc(fields.get(inputs[0]).fieldId, inputs[1])) {
           Field fill = fields.get(inputs[0]);
           fillRow(fill.startRow, fill.startCol, 
             formatValueString(inputs[1], fill.maxSpaces, fill.startCol)); 
@@ -61,6 +61,7 @@ class Page {
         fillRow(13, 0, "INVALID COMMAND");
       updateScreen();
       input = scan.nextLine().toUpperCase();
+      System.out.println("Input:: " + input);
     } 
     return buttons.get(input);
   }

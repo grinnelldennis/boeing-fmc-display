@@ -7,7 +7,9 @@ class Kernel {
     Navigation nv = new Navigation();
     World wr = new World();
 
-    DataInterface br = new DataInterface(ac, nv, wr);
+    FlightPlan fp = new FlightPlan();
+    NavigationDatabase nd = new NavigationDatabase();
+    DataInterface br = new DataInterface(ac, nv, wr, nd, fp);
 
     HashMap<String, Page> screens = new HashMap<>();
     screens.put("IDENT", new Page("Ident", br));
