@@ -18,7 +18,8 @@ class DataInterface {
   char[][] screen;
   HashMap<String, Field> fields;
 
-  public DataInterface(Aircraft ac, Navigation nv, World wr, NavigationDatabase nd, FlightPlan fp) {
+  public DataInterface(Aircraft ac, Navigation nv, World wr, 
+      NavigationDatabase nd, FlightPlan fp) {
     screen = new char[14][24];
     this.ac = ac;
     this.nv = nv;
@@ -28,46 +29,42 @@ class DataInterface {
   }
 
 
-  /* Input-Output Methods */
+  /* 
+   *    Input-Output Methods 
+   *                            */
 
-  public char[][] readInput(String pos, String key, String value, char[][] screen, HashMap<String, Field> fields) {
-    this.screen = screen;
-    this.fields = fields;
-
-    String[] keys = key.split("-");
-      System.out.println("READINPUT::KEY: " + key);
-    if (writeInputToScreen(keys[0], keys[1], value)) {
-      Field f = fields.get(pos);
-      if (fields.containsKey(pos))
-        writeToRowOnScreen(f.startRow, f.startCol, 
-          formatValueString(value, f.maxSpaces, f.startCol)); 
-    } else
+  /**
+   * Reads input from page. If input->valid, it updates the corresponding 
+   *  objects to reflect the user input. It otherwise prints error message.
+   * @param pos, corresponding position of input on page
+   * @param f, field where the input is going 
+   * @param value, input
+   * @param sr, screen
+   * @param fd, all the fields 
+   * @return
+   */
+  public char[][] read(String pos, Field f, String value, char[][] sr, Fields fd) {
+    this.screen = sr;
+    String[] keys = f.fieldId.split("-");
+    if (writeInputToScreen(keys[0], keys[1], value, fd))
+      writeToRowOnScreen(f.row, f.col, 
+        formatValueString(value, f.maxSpaces, f.col)); 
+    else
       writeErrorMessage("INVALID COMMAND");
     return screen;
   }
 
 
-  /* Screen-Drawing Methods */
+  /* 
+   *    Screen-Drawing Methods 
+   *                             */
 
   private void writeErrorMessage(String s) {
     if (s.length() < 24) writeToRowOnScreen(13, 0, s);
     else writeToRowOnScreen(13, 0, s.substring(0, 24));
   }
 
-  /**
-  * Fills FMC screen with character fill "times", starting from col on row
-  *   by overwriting the existing character on the 2D array 
-  * e.g. writing whitespaces 6 times
-  * @param row, target row
-  * @param col, target col
-  * @param fill, fill for target [row][col]
-  * @param times, number of times to fill with character
-  * @return col, incremented position along the screen
-  */
-  private void writeToRowOnScreen(int row, int col, char fill, int times) {
-    for (int i = 0; i < times; i++) 
-      screen[row][col++] = fill;
-  }
+
 
   /**
   * Fills FMC screen with string "fill", starting from col on row
@@ -89,7 +86,7 @@ class DataInterface {
   *   s with white spaces.
   * @param s, string to be formatted
   * @param maxSpaces, maximum length allocated for s on screen
-  * @param col, left jusitifed if col equals 0
+  * @param col, left justified if col equals 0
   * @return formatted string ready for fillScreen()
   */
   private String formatValueString(String s, int maxSpaces, int col) {
@@ -107,21 +104,23 @@ class DataInterface {
 
 
 
-  /* Parser-Select-Writer Methods */
+  /* 
+   *    Parser-Select-Writer Methods 
+   *                                    */
 
-  private boolean writeInputToScreen(String category, String key, String value) {
+  private boolean writeInputToScreen(String category, String key, String value, Fields fd) {
     System.out.println ("parseKey " + key + " " + value);
     switch(category) {
       case "FP":
-        return parseFlightPlan(key, value);
+        return parseFlightPlan(key, value, fd);
       case "I":
-        return parseInformation(key, value);
+        return parseInformation(key, value, fd);
       default:
         return false;
     } 
   }
 
-  private boolean parseInformation(String key, String value){
+  private boolean parseInformation(String key, String value, Fields fd){
     switch(key) {
       case "AIRPORT":
         if (airportExists(value)) {
@@ -132,17 +131,23 @@ class DataInterface {
     return true;
   }
 
-  private boolean parseFlightPlan(String key, String value) {
+  private boolean parseFlightPlan(String key, String value, Fields fd) {
     switch(key) {
       case "ORGNARPT":  //Origin Airport
-        if (airportExists(value))
+        if (airportExists(value)) {
+          fd.put("FP-"+key, value);
           fp.setOrigin(nd.airports.get(value));
+          //clear flight-plan
+        }
         break;
       case "DESTARPT":  //Destination Airport
-        if (airportExists(value))
+        if (airportExists(value)){
+          fd.put("FP-"+key, value);
+          System.out.println("FP-"+key + " " +value);
           fp.setDestination(nd.airports.get(value));
-        break;
+        } break;
       case "FLTNO":   //Flight Number
+          fd.put("FP-"+key, value);
           fp.setFlightNumber(value);
         break;
       default:

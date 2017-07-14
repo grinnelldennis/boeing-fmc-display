@@ -4,71 +4,76 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 class Page {
+  //GENERIC SCREEN INFORMATION
   String title;
   char[][] screen;
+  Scanner scan;
+  
   DataInterface bridge;
   final int ROW_SIZE = 14;
   final int COL_SIZE = 24;
-  Scanner scan;
-  HashMap<String, String> buttons;      //<screenLocation, buttonId>
-  HashMap<String, Field> fields;       //<screenLocation, fieldId>
+  
+  HashMap<String, Field> fieldsLocation;    //<location, fieldId>
+  HashMap<String, Field> outputf;           //Fields Pending of Output
+  HashMap<String, String> buttons;          //<screenLocation, buttonId>
 
-  public Page(String title, DataInterface bridge) throws FileNotFoundException{
+  public Page(String title, DataInterface bridge, Fields inputf) throws FileNotFoundException{
     this.bridge = bridge; 
     this.title = title;
+    //INIT OBJECTS
     scan = new Scanner(System.in);
-    fields = new HashMap<>();
+    outputf = new HashMap<>();
+    fieldsLocation = new HashMap<>();
     buttons = new HashMap<>();
     screen = new char[ROW_SIZE][COL_SIZE];
     //INIT PAGE
-    fillWithSpace();
+    clearScreen();
     Scanner fscan = new Scanner(new File("./pages/"+title+".txt"));
-    parseFile(fscan);
-    //LOAD DEBUG
-    System.out.println("Page contains " + buttons.size() + " buttons.");
-    System.out.println("Page contains " + fields.size() + " fields.");
+    parseFile(fscan, inputf);
+    if (true) {   //DEBUG
+      System.out.println("Page contains " + buttons.size() + " buttons.");
+      System.out.println("Page contains " + fieldsLocation.size() + " fields.");
+    }
+  } 
+
+  public String openPage(Fields fd) {
+    updateScreen(fd);
+    return inputListener(fd);
   }
 
-  public String openPage() {
+  private void updateScreen(Fields fd) {
+    printFilledOutputs(fd);
     renderToScreen();
-    return inputListener();
+  }
+
+  private void printFilledOutputs(Fields fd) {
+    for (String key : outputf.keySet())
+      if (fd.containsKey(key)){
+        Field f = outputf.get(key);
+        fill(f.row, f.col, formatValueString(fd.get(key), f.maxSpaces, f.col));
+      }
   }
 
   // model button presses & typed-inputs
-  public String inputListener() {
+  public String inputListener(Fields fd) {
     String input = scan.nextLine().toUpperCase();
     while (!isAButtonPress(input)) {
       clearRow(13);
       String[] inputs = input.split(" "); 
-      if (inputs.length == 2 && fields.containsKey(inputs[0]))
-        screen = bridge.readInput(inputs[0], fields.get(inputs[0]).fieldId, inputs[1], screen, fields);
-      else
-        fillRow(13, 0, "INVALID COMMAND");
-      updateScreen();
+      if (inputs.length == 2 && fieldsLocation.containsKey(inputs[0])) {
+        String pos = inputs[0], value = inputs[1]; 
+        screen = bridge.read(pos, fieldsLocation.get(pos), value, screen, fd);
+      } else
+        fill(13, 0, "INVALID COMMAND");
+      updateScreen(fd);
       input = scan.nextLine().toUpperCase();
       System.out.println("Input:: " + input);
     } 
     return buttons.get(input);
   }
 
-  private void updateScreen() {
-    renderToScreen();
-  }
-
   private boolean isAButtonPress(String input) {
     return buttons.containsKey(input);  
-  }
-
-  /**
-  * Initializes the 2d array with whitespaces
-  */
-  private void fillWithSpace() {
-    for (int x = 0; x < ROW_SIZE; x++)
-      fillRow(x, 0, ' ', COL_SIZE);
-  }
-
-  private void clearRow(int r) {
-    fillRow(r, 0, ' ', COL_SIZE);
   }
 
   /**
@@ -96,12 +101,12 @@ class Page {
   *   parseLine to parse each individual lines
   * @param fscan, an open file Scanner
   */
-  private void parseFile(Scanner fscan) {
+  private void parseFile(Scanner fscan, Fields inputf) {
     int rowIndex = 0;
     while (fscan.hasNext()) {
       String line = fscan.nextLine();
       if (!line.startsWith(";")) {
-        parseLine(line, rowIndex);
+        parseLine(line, rowIndex, inputf);
         rowIndex++;
       }
     }
@@ -114,35 +119,44 @@ class Page {
   * @param line, line of text from instruction file
   * @param row, row to write into 
   */
-  private void parseLine(String line, int row) {
+  private void parseLine(String line, int row, Fields inputf) {
     int spaces, col = 0;
+    Field field;
     String[] parts = line.split(" ");
     for (int i = 0; i < parts.length; i++) {
-      System.out.println("::reading.. " + parts[i] + parts[i+1]);     //debug
+          System.out.println("::reading.. " + parts[i] + parts[i+1]);     //DEBUG
+      String action = parts[i], fieldId;
       switch (parts[i++]) {
         case "SPACE":
-          col = fillRow(row, col, ' ', Integer.parseInt(parts[i]));
+          col = fill(row, col, ' ', Integer.parseInt(parts[i]));
           break;
         case "READ":
-          col = fillRow(row, col, getValue(parts[i++], Integer.parseInt(parts[i]), col));
+          col = fill(row, col, getValue(parts[i++], Integer.parseInt(parts[i]), col));
           break;
-        case "IN-ESS":    //"Essential" Inputs, shows up as Vertical Boxes
-          spaces = Integer.parseInt(parts[i+1]);
-          fields.put(getPosition(row, col), new Field(parts[i++], spaces, row, col));
-          col = fillRow(row, col, '0',spaces);
+        case "IN-ESS":    
+        case "IN-OPT":
+        case "IN-BNK": 
+          fieldId = parts[i++];
+          spaces = Integer.parseInt(parts[i]);
+          field = new Field(fieldId, spaces, row, col);
+          inputf.create(fieldId);
+          fieldsLocation.put(getPosition(row, col), field);
+          
+          if (action.endsWith("ESS")) 
+            col = fill(row, col, '0', spaces);
+          else if (action.endsWith("OPT")) 
+            col = fill(row, col, '-', spaces);
+          else if (action.endsWith("BNK")) 
+            col = fill(row, col, ' ', spaces);
           break;
-        case "IN-OPT":    //"Optional" Inputs, shows up as Dashes
-          spaces = Integer.parseInt(parts[i+1]);
-          fields.put(getPosition(row, col), new Field(parts[i++], spaces, row, col));
-          col = fillRow(row, col, '-', spaces);
-          break;
-        case "IN-BNK":    //"Blank" Inputs, shows up as Blanks
-          spaces = Integer.parseInt(parts[i+1]);
-          fields.put(getPosition(row, col), new Field(parts[i++], spaces, row, col));
-          col = fillRow(row, col, ' ', spaces);
+        case "OUT":
+          fieldId = parts[i++];
+          spaces = Integer.parseInt(parts[i]);
+          outputf.put(fieldId, new Field(fieldId, spaces, row, col, ""));
+          col = fill(row, col, ' ', spaces);
           break;
         case "PRINT":
-          col = fillRow(row, col, parts[i]);
+          col = fill(row, col, parts[i]);
           break;
         case "BUTTON":
           col = processButton(row, col, parts[i]);
@@ -163,11 +177,11 @@ class Page {
       buttons.put(getPosition(row, col), part.substring(1));
     else
       buttons.put(getPosition(row, col), part.substring(0, part.length()-1));
-    return fillRow(row, col, part);
+    return fill(row, col, part);
   }
 
   /**
-  * Calls bridge to get neceessary information to display on screen and format
+  * Calls bridge to get necessary information to display on screen and format
   *   such value.
   * @param key, String to recover value for from bridge
   * @param maxSpaces, maximum length allocated for s on screen
@@ -185,7 +199,7 @@ class Page {
   *   s with white spaces.
   * @param s, string to be formatted
   * @param maxSpaces, maximum length allocated for s on screen
-  * @param col, left jusitifed if col equals 0
+  * @param col, left justified if col equals 0
   * @return formatted string ready for fillScreen()
   */
   private String formatValueString(String s, int maxSpaces, int col) {
@@ -202,35 +216,45 @@ class Page {
   }
 
   /**
-  * Fills FMC screen with character fill "times", starting from col on row
-  *   by overwriting the existing character on the 2D array 
-  * e.g. writing whitespaces 6 times
+  * Fills Screen with character fill "times"
+  * e.g. writing whitespace 6 times
   * @param row, target row
   * @param col, target col
   * @param fill, fill for target [row][col]
   * @param times, number of times to fill with character
   * @return col, incremented position along the screen
   */
-  private int fillRow(int row, int col, char fill, int times) {
+  private int fill(int row, int col, char fill, int times) {
     for (int i = 0; i < times; i++) 
       screen[row][col++] = fill;
     return col;
   }
 
   /**
-  * Fills FMC screen with string "fill", starting from col on row
-  *   by overwriting the existing character on the 2D array 
+  * Fills Screen
   * e.g. writing "POS INIT" to screen
   * @param row, target row
   * @param col, target col
   * @param fill, fill for target [row][col]
   * @return col, incremented position along the screen
   */
-  private int fillRow(int row, int col, String fill) {
+  private int fill(int row, int col, String fill) {
     for (char c: fill.toCharArray()) 
       screen[row][col++] = c;
     return col;
   }
 
+  /**
+   * Initializes the 2d array with whitespace
+   */
+  private void clearScreen() {
+    for (int x = 0; x < ROW_SIZE; x++)
+      fill(x, 0, ' ', COL_SIZE);
+  }
 
+  private void clearRow(int r) {
+    fill(r, 0, ' ', COL_SIZE);
+  }
+
+  
 }
