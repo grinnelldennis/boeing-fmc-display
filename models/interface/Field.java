@@ -10,9 +10,9 @@ class Field{
   ArrayList<String> dependencies;
   public Field(String id, int spaces, int r, int c) {
     //FOR INPUT FIELDS
-    this.fieldId = id; 
-    this.maxSpaces = spaces; 
-    this.row = r; 
+    this.fieldId = id;
+    this.maxSpaces = spaces;
+    this.row = r;
     this.col = c;
     this.text = null;
     this.takesInput = true;
@@ -20,9 +20,9 @@ class Field{
   }
   public Field(String id, int spaces, int r, int c, String d) {
     //FOR OUTPUT FIELDS
-    this.fieldId = id; 
-    this.maxSpaces = spaces; 
-    this.row = r; 
+    this.fieldId = id;
+    this.maxSpaces = spaces;
+    this.row = r;
     this.col = c;
     this.text = null;
     this.takesInput = false;
