@@ -22,5 +22,7 @@
 hs_err_pid*
 
 # Ignore Directory
-unnecessary/
-pmdg/
+screens_pmdg/
+screens_page/
+references/
+deprecated/

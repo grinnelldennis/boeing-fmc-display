@@ -26,13 +26,48 @@ NV-DEFF,NAV DATA EFFECTIVE DATE,READ-ONCE,STRING,13,RIGHT
 format string
 
 
+-----------------------------------------------JULY 24/2017
+
+INPUT FILES
+
+SCREEN_LAYOUT, specifying, ALL FIELDS WITHIN A PAGE
+--col
+--row
+--spaces
+--alignment
+--dependencies
+()
+
+
+
+
+
+
+
+
+DATA STRUCTURES
+
+
+
+
+
+
+
+
+
+
+-----------------------------------------------------------
+
+
+
+
 
 
 
 Features to Implement
 
 -Warning Messages
-***NAV DATA OUT OF DATE 
+***NAV DATA OUT OF DATE
 ***ROUTE 1 UPLINK READY
 
 
@@ -41,7 +76,7 @@ Design
 
 load preset with formatting strings
 placeholder
-loading 
+loading
 
 Load from Objects::  XX (CHAR) OR ## (NUM)
 Placeholder Texts::  ▯▯
@@ -58,7 +93,7 @@ Screens Mock Ups
 Aircraft & Nav Ident Page
 __________________________
 |          IDENT         |
-| MODEL        ENG RATING|      -click on side button, returns position 
+| MODEL        ENG RATING|      -click on side button, returns position
 |XXXXXXXXXX  XXXXXXXXXXXX|
 | NAV DATA         ACTIVE|
 |AIRAC-1601 JAN07FEB03/16|
@@ -66,7 +101,7 @@ __________________________
 |                        |
 |                        |
 |                        |
-|                 DRAG/FF| 
+|                 DRAG/FF|
 |               +0.0/+0.0|
 |------------------------|
 |<INDEX         POS INIT>|
@@ -85,7 +120,7 @@ __________________________
 | UTC             GPS POS|
 |2030Z N48D36.2 W123D01.2|
 |        SET INERTIAL POS|
-|                        | 
+|                        |
 |------------------------|
 |<INDEX            ROUTE>|
 |________________________|
@@ -104,7 +139,7 @@ __________________________
 |                        |
 |                        |
 | ROUTE -----------------|
-|<SAVE              ALTN>| 
+|<SAVE              ALTN>|
 |                        |
 |<RTE 2         ACTIVATE>|
 |________________________|
@@ -119,7 +154,7 @@ __________________________
 |                        |
 |                        |
 | ROUTE -----------------|
-|<SAVE              ALTN>| 
+|<SAVE              ALTN>|
 |                        |
 |<RTE 2         ACTIVATE>|
 |________________________|
@@ -136,7 +171,7 @@ __________________________
 |DMN          ----/------|
 | 277°     68NM          |
 |WOBUG        ----/------|
-| 279°    163NM          | 
+| 279°    163NM          |
 |PXR          ----/------|
 |------------------------|
 |<RTE 2 LEGS    ACTIVATE>|
@@ -156,7 +191,7 @@ __________________________
 |                        |
 |                        |
 |------------------------|
-|                        | 
+|                        |
 | DEP                 ARR|
 |<----              ---->|
 |________________________|
@@ -172,7 +207,7 @@ __________________________
 |                        |
 |                        |
 |                        |
-|                        | 
+|                        |
 |------------------------|
 |<INDEX            ROUTE>|
 |________________________|
@@ -188,7 +223,7 @@ __________________________
 |                        |
 |                        |
 |                        |
-|                        | 
+|                        |
 |------------------------|
 |<INDEX            ROUTE>|
 |________________________|
@@ -206,7 +241,7 @@ __________________________
 | RESERVES         CRZ CG|
 |###.#              ##.#%|
 |PREF INIT      STEP SIZE|
-|<REQUEST            RVSM| 
+|<REQUEST            RVSM|
 |------------------------|
 |<INDEX       THRUST LIM>|
 |________________________|
@@ -224,7 +259,7 @@ __________________________
 | TO 2                   |
 |<-20%             CLB 2>|
 |                        |
-|                        | 
+|                        |
 |------------------------|
 |<INDEX          TAKEOFF>|
 |________________________|
@@ -256,8 +291,7 @@ __________________________
 | RESERVES         CRZ CG|
 |###.#              ##.#%|
 |     PREF INIT DATA     |
-|<REJECT          ACCEPT>| 
+|<REJECT          ACCEPT>|
 |------------------------|
 |<INDEX       THRUST LIM>|
 |PREF INIT UPLINK________|
-
