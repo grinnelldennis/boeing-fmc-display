@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Airport {
-  String icao;
+  private String icao;
   String name;
   private ArrayList<Runway> runways;
   HashMap<String, Coordinate> fixes;
@@ -12,7 +12,7 @@ public class Airport {
   HashMap<String, Procedure> sids;
   HashMap<String, Procedure> stars;
 
-  public Airport(String name, String icao) {
+  public Airport(String icao, String name) {
     this.name = name;
     this.icao = icao;
     runways = new ArrayList<>();
@@ -33,6 +33,7 @@ public class Airport {
     if (coord==null) throw new IllegalArgumentException("Coordinate is null.");
     gates.put(gateId, coord);
   }
+  
   public void add(Runway runway) {
     if (runway==null) throw new IllegalArgumentException("Runway is null.");
     getRunways().add(runway);
@@ -47,5 +48,10 @@ public class Airport {
   public ArrayList<Runway> getRunways() {
     return runways;
   }
+
+  public String getIcao() {
+    return icao;
+  }
+
 
 }

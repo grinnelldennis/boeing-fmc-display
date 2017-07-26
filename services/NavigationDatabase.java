@@ -50,24 +50,14 @@ public class NavigationDatabase {
 
   private void addToNavaids(String s) {
     if (s.startsWith(";")) return;
-    //if (s.length() != NAV_LINE_LENGTH)
-    //  throw new IllegalStateException("Invalid Navaid Entry");
-    System.out.println (s);
-    // Decompose each line in Navaid file
-    String brief = s.substring(0, 24); // 24 characters-long
-    String ident = s.substring(24, s.indexOf(" ", 24)); // 5 characters-long
-    String type = s.substring(29, s.indexOf(" ", 33)); // 4 characters-long
-    String lat = s.substring(33, 43); // 10 characters-long
-    String lon =  s.substring(43, 54); // 11 characters-long
-    String freq = s.substring(54, 60); // 6 characters-long
-    char desig = s.charAt(60); // 1 characters-long
+    if (s.length() != NAV_LINE_LENGTH)
+      System.out.println ("$$INVALID LINE LENGTH. "+s);
+    
+    Navaid nav = new Navaid(s);
+    String ident = nav.getId();
 
-    Navaid nav = new Navaid(ident, brief, type, freq, desig, lat, lon);
-
-    if (!getNavaids().containsKey(ident)) {
-      ArrayList<Navaid> temp = new ArrayList<>();
-      getNavaids().put(ident, temp);
-    }
+    if (!getNavaids().containsKey(ident))
+      getNavaids().put(ident, new ArrayList<Navaid>());
 
     ArrayList<Navaid> ls = getNavaids().get(ident);
     ls.add(nav);
@@ -104,31 +94,14 @@ public class NavigationDatabase {
     if (s.length() != APT_LINE_LENGTH) // Add Logging Option
       throw new IllegalStateException("Invalid Airport Entry: " + s);
 
-    System.out.println ("AIRPORT. "+s);
-    String icao = s.substring(24, 28); // 4 charactesr-long
-    System.out.println(icao);
+    String icao = s.substring(24, 28); // 4 Characters-long
     if (!getAirports().containsKey(icao))
       getAirports().put(icao, new Airport(icao, s.substring(0, 24)));
 
-    Runway r = createRunway(s);
-    Airport a = getAirports().get(icao);
-    a.getRunways().add(r);
-    getAirports().put(icao, a);
+    Airport airport = getAirports().get(icao);
+    airport.getRunways().add(new Runway(s));
+    getAirports().put(icao, airport);
   }
-
-  private Runway createRunway(String s) {
-    String runwayId = s.substring(28, 31);
-    System.out.println(runwayId);
-    int length = Integer.parseInt(s.substring(33, 39));
-    String latitude = s.substring(39, 49);
-    String longitude = s.substring(49, 60);
-    double ilsRadio = Double.parseDouble(s.substring(60, 66));
-    int heading = Integer.parseInt(s.substring(66, 69));
-    //duplicated mag heading
-    int elevation = Integer.parseInt(s.substring(70, 74));
-    return new Runway(runwayId, length, latitude, longitude, ilsRadio, elevation, heading);
-  }
-
 
   public HashMap<String, Airport> getAirports() {
     return airports;
