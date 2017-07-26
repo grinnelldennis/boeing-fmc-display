@@ -2,6 +2,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import modelsinterface.Waypoint;
 import services.NavigationDatabase;
 import modelsnav.Navaid;
 import services.FlightPlan;
@@ -12,7 +13,7 @@ class Test{
     NavigationDatabase nd = new NavigationDatabase();
     FlightPlan fp = new FlightPlan();
     System.out.println ("#Airports. "+nd.getAirports().size());
-    System.out.println ("#Navaids. "+nd.getNavaids().size());
+    System.out.println ("#Navaids. "+nd.getWaypoints().size());
     
     addWaypointTest(nd, fp);
   } 
@@ -36,24 +37,24 @@ class Test{
     
     String input = getInput("$$Navaid. ");
     while (!input.equals("quit")) {
-      if (nd.getNavaids().containsKey(input))
-        if (nd.getNavaids().get(input).size() > 1)
-          fp.addWaypoint(nd.getNavaids().get(input).get(disambiguateInput(nd.getNavaids().get(input))));
+      if (nd.getWaypoints().containsKey(input))
+        if (nd.getWaypoints().get(input).size() > 1)
+          fp.addWaypoint(nd.getWaypoints().get(input).get(disambiguateInput(nd.getWaypoints().get(input))));
         else
-          fp.addWaypoint(nd.getNavaids().get(input).get(0));
+          fp.addWaypoint(nd.getWaypoints().get(input).get(0));
       else
         System.out.println("Navaid Not Found.");
       input = getInput("$$Navaid. ");
     }
   }
   
-  private static int disambiguateInput(ArrayList<Navaid> list){
-    printOptions(list);
+  private static int disambiguateInput(ArrayList<Waypoint> list){
+    printAllNavaidOptions(list);
     return convertButtonPressToIndex(getInput("Choose Option."));
   }
   
-  private static void printOptions(ArrayList<Navaid> list) {
-    for (Navaid nav : list)
+  private static void printAllNavaidOptions(ArrayList<Waypoint> list) {
+    for (Waypoint nav : list)
       System.out.println(nav.getInfo());
   }
   

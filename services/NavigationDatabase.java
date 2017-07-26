@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
+
+import modelsinterface.Waypoint;
 import modelsnav.Airport;
 import modelsnav.Navaid;
 import modelsnav.Runway;
@@ -21,7 +23,7 @@ public class NavigationDatabase {
   final int APT_LINE_LENGTH = 74;
 
   private HashMap<String, Airport> airports;
-  private HashMap<String, ArrayList<Navaid>> navaids;
+  private HashMap<String, ArrayList<Waypoint>> waypoints;
 
   public NavigationDatabase() throws FileNotFoundException {
     setAirports(new HashMap<>());
@@ -53,15 +55,15 @@ public class NavigationDatabase {
     if (s.length() != NAV_LINE_LENGTH)
       System.out.println ("$$INVALID LINE LENGTH. "+s);
     
-    Navaid nav = new Navaid(s);
+    Waypoint nav = new Navaid(s);
     String ident = nav.getId();
 
-    if (!getNavaids().containsKey(ident))
-      getNavaids().put(ident, new ArrayList<Navaid>());
+    if (!getWaypoints().containsKey(ident))
+      getWaypoints().put(ident, new ArrayList<Waypoint>());
 
-    ArrayList<Navaid> ls = getNavaids().get(ident);
+    ArrayList<Waypoint> ls = getWaypoints().get(ident);
     ls.add(nav);
-    getNavaids().put(ident, ls);
+    getWaypoints().put(ident, ls);
   }
 
 
@@ -111,13 +113,12 @@ public class NavigationDatabase {
     this.airports = airports;
   }
 
-
-  public HashMap<String, ArrayList<Navaid>> getNavaids() {
-    return navaids;
+  public HashMap<String, ArrayList<Waypoint>> getWaypoints() {
+    return waypoints;
   }
 
-  public void setNavaids(HashMap<String, ArrayList<Navaid>> navaids) {
-    this.navaids = navaids;
+  public void setNavaids(HashMap<String, ArrayList<Waypoint>> navaids) {
+    this.waypoints = navaids;
   }
   
   

@@ -15,5 +15,7 @@ public interface Waypoint {
   */
   public Coordinate getCoordinate();
 
+  public String getInfo();
+
 
 }
