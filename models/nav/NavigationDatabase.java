@@ -1,32 +1,27 @@
-package services;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
-import modelsnav.Airport;
-import modelsnav.Navaid;
-import modelsnav.Runway;
 
 /*
   NavigationDatabase.java
    Parses FSX-PMDG nav text files and create objects to represent each navigatable
    fixes as an object.
                                                                               */
-public class NavigationDatabase {
+class NavigationDatabase {
   //MUTABLE
   final String PATH = "C:/Users/Dennis Chan/Desktop/boeing-fmc-display/data/";
   final int NAV_LINE_LENGTH = 61;
   final int APT_LINE_LENGTH = 74;
 
-  private HashMap<String, Airport> airports;
-  private HashMap<String, ArrayList<Navaid>> navaids;
+  HashMap<String, Airport> airports;
+  HashMap<String, ArrayList<Navaid>> navaids;
 
   public NavigationDatabase() throws FileNotFoundException {
-    setAirports(new HashMap<>());
-    setNavaids(new HashMap<>());
-    loadAirports(new File(PATH+"wpNavAPT.txt"));
+    airports = new HashMap<>();
+    navaids = new HashMap<>();
+    //loadAirports(new File(PATH+"wpNavAPT.txt"));
     loadNavaids(new File(PATH+"wpNavAID.txt"));
   }
 
@@ -45,7 +40,6 @@ public class NavigationDatabase {
     Scanner scanf = new Scanner(f);
     while (scanf.hasNext())
       addToNavaids(scanf.nextLine());
-    scanf.close();
   }
 
   private void addToNavaids(String s) {
@@ -55,23 +49,23 @@ public class NavigationDatabase {
     System.out.println (s);
     // Decompose each line in Navaid file
     String brief = s.substring(0, 24); // 24 characters-long
-    String ident = s.substring(24, s.indexOf(" ", 24)); // 5 characters-long
-    String type = s.substring(29, s.indexOf(" ", 33)); // 4 characters-long
-    String lat = s.substring(33, 43); // 10 characters-long
-    String lon =  s.substring(43, 54); // 11 characters-long
-    String freq = s.substring(54, 60); // 6 characters-long
+    String ident = s.substring(24, 29); // 5 characters-long
+    String type = s.substring(29, 33); // 4 characters-long
+    double lat = Double.parseDouble(s.substring(33, 43)); // 10 characters-long
+    double lon =  Double.parseDouble(s.substring(43, 54)); // 11 characters-long
+    double freq = Double.parseDouble(s.substring(54, 60)); // 6 characters-long
     char desig = s.charAt(60); // 1 characters-long
 
-    Navaid nav = new Navaid(ident, brief, type, freq, desig, lat, lon);
+    Navaid nav = new Navaid(new Fix(ident, lat, lon), brief, type, freq, desig);
 
-    if (!getNavaids().containsKey(ident)) {
+    if (!navaids.containsKey(ident)) {
       ArrayList<Navaid> temp = new ArrayList<>();
-      getNavaids().put(ident, temp);
+      navaids.put(ident, temp);
     }
 
-    ArrayList<Navaid> ls = getNavaids().get(ident);
+    ArrayList<Navaid> ls = navaids.get(ident);
     ls.add(nav);
-    getNavaids().put(ident, ls);
+    navaids.put(ident, ls);
   }
 
 
@@ -107,45 +101,25 @@ public class NavigationDatabase {
     System.out.println ("AIRPORT. "+s);
     String icao = s.substring(24, 28); // 4 charactesr-long
     System.out.println(icao);
-    if (!getAirports().containsKey(icao))
-      getAirports().put(icao, new Airport(icao, s.substring(0, 24)));
+    if (!airports.containsKey(icao))
+      airports.put(icao, new Airport(icao, s.substring(0, 24)));
 
     Runway r = createRunway(s);
-    Airport a = getAirports().get(icao);
-    a.getRunways().add(r);
-    getAirports().put(icao, a);
+    Airport a = airports.get(icao);
+    a.runways.add(r);
+    airports.put(icao, a);
   }
 
   private Runway createRunway(String s) {
     String runwayId = s.substring(28, 31);
     System.out.println(runwayId);
     int length = Integer.parseInt(s.substring(33, 39));
-    String latitude = s.substring(39, 49);
-    String longitude = s.substring(49, 60);
+    double latitude = Double.parseDouble(s.substring(39, 49));
+    double longitude = Double.parseDouble(s.substring(49, 60));
     double ilsRadio = Double.parseDouble(s.substring(60, 66));
     int heading = Integer.parseInt(s.substring(66, 69));
     //duplicated mag heading
     int elevation = Integer.parseInt(s.substring(70, 74));
-    return new Runway(runwayId, length, latitude, longitude, ilsRadio, elevation, heading);
+    return new Runway(runwayId, length, new Coordinate(latitude, longitude), ilsRadio, elevation, heading);
   }
-
-
-  public HashMap<String, Airport> getAirports() {
-    return airports;
-  }
-
-  public void setAirports(HashMap<String, Airport> airports) {
-    this.airports = airports;
-  }
-
-
-  public HashMap<String, ArrayList<Navaid>> getNavaids() {
-    return navaids;
-  }
-
-  public void setNavaids(HashMap<String, ArrayList<Navaid>> navaids) {
-    this.navaids = navaids;
-  }
-  
-  
 }

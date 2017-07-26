@@ -1,6 +1,10 @@
-import java.util.ArrayList;
+package services;
 
-class FlightPlan {
+import java.util.ArrayList;
+import modelsnav.Airport;
+import modelsnav.Navaid;
+
+public class FlightPlan {
   //turn into type-Airport
   Airport origin;  //ORGNARPT, ICAO
   Airport destination; //DESTARPT, ICAO
@@ -15,10 +19,13 @@ class FlightPlan {
   public void setDestination(Airport icao) { destination = icao; }
   public void setFlightNumber(String s) { flightNo = s; }
 
-  public void addWaypoint(Navaid waypoint) {}
-  public void addWaypoint() {}
-
-    //TODO: Route Object
+  public void addWaypoint(Navaid waypoint) {
+    //TODO: STUB
   }
+  public void addWaypoint() {
+    //TODO: STUB
+    }
 
+  
+  
 }

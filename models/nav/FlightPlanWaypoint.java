@@ -1,8 +1,10 @@
+package modelsnav;
+import modelsinterface.Waypoint;;
 /*
   Interactive waypoint to encapsulate the use of all other implementation of
    waypoints for the use of FMC & route-keeping.
                                                                               */
-class FlightPlanWaypoint implements Waypoint {
+class FlightPlanWaypoint {
   final int UNDEFINED = -99999;
   Waypoint waypoint;
   //Calculated
@@ -17,7 +19,7 @@ class FlightPlanWaypoint implements Waypoint {
 
   public FlightPlanWaypoint(Waypoint wp) {
     waypoint = wp;
-    hasRestrictions = false;
+    hasRestriction = false;
     setSpeedRestriction(UNDEFINED);
     setBelowAltitude(UNDEFINED);
     setAboveAltitude(UNDEFINED);
@@ -31,15 +33,15 @@ class FlightPlanWaypoint implements Waypoint {
                       */
   public void setSpeedRestriction(int speed) {
     passingSpeed = speed;
-    hasRestrictions = true;
+    hasRestriction = true;
   }
   public void setBelowAltitude(int alt) {
     belowAltitude = alt;
-    hasRestrictions = true;
+    hasRestriction = true;
   }
   public void setAboveAltitude(int alt) {
     aboveAltitude = alt;
-    hasRestrictions = true;
+    hasRestriction = true;
   }
   public void clearRestrictions() {
     setBelowSpeed(UNDEFINED);
@@ -51,6 +53,9 @@ class FlightPlanWaypoint implements Waypoint {
   }
   public void setPassingAltitude(int alt) {
     passingAltitude = alt;
+  }
+  public void setBelowSpeed(int speed) {
+    belowSpeed = speed;
   }
 
 

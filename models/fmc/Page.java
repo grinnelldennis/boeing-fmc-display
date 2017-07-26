@@ -1,9 +1,13 @@
+package modelsfmc;
+
 import java.util.Scanner;
 import java.util.HashMap;
 import java.io.File;
 import java.io.FileNotFoundException;
+import services.DataInterface;
+import modelsinterface.Field;
 
-class Page {
+public class Page {
   //GENERIC SCREEN INFORMATION
   String title;
   char[][] screen;
@@ -28,7 +32,7 @@ class Page {
     screen = new char[ROW_SIZE][COL_SIZE];
     //INIT PAGE
     clearScreen();
-    Scanner fscan = new Scanner(new File("./pages/"+title+".txt"));
+    Scanner fscan = new Scanner(new File("C:/Users/Dennis Chan/Desktop/boeing-fmc-display/data/screens_page/"+title+".txt"));
     parseFile(fscan, inputf);
     if (true) {   //DEBUG
       System.out.println("Page contains " + buttons.size() + " buttons.");
@@ -49,12 +53,15 @@ class Page {
   private void printFilledOutputs(Fields fd) {
     for (String key : outputf.keySet())
       if (fd.containsKey(key)){
-        Field f = outputf.get(key);
-        fill(f.row, f.col, formatValueString(fd.get(key), f.maxSpaces, f.col));
+        writeFormattedValueToField(outputf.get(key), fd.get(key));
       }
   }
 
-  // model button presses & typed-inputs
+  /**
+   * 
+   * @param fd, mapping of all fields
+   * @return a page to move to next as a String
+   */
   public String inputListener(Fields fd) {
     String input = scan.nextLine().toUpperCase();
     while (!isAButtonPress(input)) {
@@ -189,9 +196,14 @@ class Page {
   * @see formatValueString()
   */
   private String getValue(String key, int maxSpaces, int col) {
-    return formatValueString(bridge.getValueFor(key), maxSpaces, col);
+    return formatValueString(bridge.getStaticValueFor(key), maxSpaces, col);
   }
 
+  private void writeFormattedValueToField(Field f, String value) {
+    fill(f.getRow(), f.getCol(), 
+        formatValueString(value, f.getMaxSpaces(), f.getCol())); 
+  }
+  
   /**
   * Formats String s to fit into maxSpaces. Col determines whether formatted
   *   String is right or left justified by if necessary prepending or appending

@@ -1,4 +1,13 @@
+package services;
+
 import java.util.HashMap;
+
+import global.Aircraft;
+import global.Navigation;
+import global.World;
+import modelsinterface.Field;
+import modelsfmc.Fields;
+import modelsnav.Airport;
 /**
 *  DATAINTERFACE
 *   
@@ -7,14 +16,14 @@ import java.util.HashMap;
 *    required by FMC
 */
 
-class DataInterface {
+public class DataInterface {
 
   Aircraft ac;
   Navigation nv;
   World wr;
   NavigationDatabase nd;
   FlightPlan fp;
-  //SCREEN IO
+  //SCREEN INPUT/OUTPUT
   char[][] screen;
   HashMap<String, Field> fields;
 
@@ -28,11 +37,9 @@ class DataInterface {
     this.fp = fp;
   }
 
-
   /* 
    *    Input-Output Methods 
    *                            */
-
   /**
    * Reads input from page. If input->valid, it updates the corresponding 
    *  objects to reflect the user input. It otherwise prints error message.
@@ -45,10 +52,9 @@ class DataInterface {
    */
   public char[][] read(String pos, Field f, String value, char[][] sr, Fields fd) {
     this.screen = sr;
-    String[] keys = f.fieldId.split("-");
+    String[] keys = f.getFieldId().split("-");
     if (writeInputToScreen(keys[0], keys[1], value, fd))
-      writeToRowOnScreen(f.row, f.col, 
-        formatValueString(value, f.maxSpaces, f.col)); 
+      writeFormattedValueToField(f, value);
     else
       writeErrorMessage("INVALID COMMAND");
     return screen;
@@ -58,14 +64,16 @@ class DataInterface {
   /* 
    *    Screen-Drawing Methods 
    *                             */
-
   private void writeErrorMessage(String s) {
     if (s.length() < 24) writeToRowOnScreen(13, 0, s);
     else writeToRowOnScreen(13, 0, s.substring(0, 24));
   }
 
-
-
+  private void writeFormattedValueToField(Field f, String value) {
+    writeToRowOnScreen(f.getRow(), f.getCol(), 
+        formatValueString(value, f.getMaxSpaces(), f.getCol())); 
+  }
+  
   /**
   * Fills FMC screen with string "fill", starting from col on row
   *   by overwriting the existing character on the 2D array 
@@ -107,7 +115,6 @@ class DataInterface {
   /* 
    *    Parser-Select-Writer Methods 
    *                                    */
-
   private boolean writeInputToScreen(String category, String key, String value, Fields fd) {
     System.out.println ("parseKey " + key + " " + value);
     switch(category) {
@@ -124,8 +131,8 @@ class DataInterface {
     switch(key) {
       case "AIRPORT":
         if (airportExists(value)) {
-          writeToRowOnScreen(4, 6, formatValueString(nd.airports.get(value).runways.get(1).coord.getLatNSDot(), 8, 1)); 
-          writeToRowOnScreen(4, 15, formatValueString(nd.airports.get(value).runways.get(1).coord.getLonEWDot(), 9, 1));
+          writeToRowOnScreen(4, 6, formatValueString(nd.getAirports().get(value).getRunways().get(1).coord.getLatNSDot(), 8, 1)); 
+          writeToRowOnScreen(4, 15, formatValueString(nd.getAirports().get(value).getRunways().get(1).coord.getLonEWDot(), 9, 1));
         } break;
     }
     return true;
@@ -136,7 +143,7 @@ class DataInterface {
       case "ORGNARPT":  //Origin Airport
         if (airportExists(value)) {
           fd.put("FP-"+key, value);
-          fp.setOrigin(nd.airports.get(value));
+          fp.setOrigin(nd.getAirports().get(value));
           //clear flight-plan
         }
         break;
@@ -144,7 +151,7 @@ class DataInterface {
         if (airportExists(value)){
           fd.put("FP-"+key, value);
           System.out.println("FP-"+key + " " +value);
-          fp.setDestination(nd.airports.get(value));
+          fp.setDestination(nd.getAirports().get(value));
         } break;
       case "FLTNO":   //Flight Number
           fd.put("FP-"+key, value);
@@ -157,13 +164,14 @@ class DataInterface {
   }
 
   private boolean airportExists(String icao) {
-    return nd.airports.containsKey(icao);
+    return nd.getAirports().containsKey(icao);
   }
 
 
-  /* Object Read-Only Methods */
-
-  public String getValueFor(String key) {
+  /* 
+   *  Object Read-Only Methods 
+   *                              */
+  public String getStaticValueFor(String key) {
     if (key.startsWith("AC-") && ac.attributes.containsKey(key))
       return ac.attributes.get(key);
     else if (key.startsWith("NV-") && nv.attributes.containsKey(key))

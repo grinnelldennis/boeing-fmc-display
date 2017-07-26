@@ -2,9 +2,9 @@ package global;
 
 import java.util.HashMap;
 
-class Navigation {
+public class Navigation {
   
-  HashMap<String, String> attributes;
+  public HashMap<String, String> attributes;
 
   public Navigation() {
     attributes = new HashMap<>();

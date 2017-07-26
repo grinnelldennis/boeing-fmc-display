@@ -1,9 +1,10 @@
+package modelsnav;
 
 /*
   Object that stores geographical information based on a location's latitude
    and latitude, as doubles, in the format of +/-00.00000, +/-000.00000
 */
-class Coordinate{
+public class Coordinate{
   double latitude;
   double longitude;
   /**
@@ -52,7 +53,7 @@ class Coordinate{
   }
 
   /**
-  * Returns Laotitude in format N00.00000 or S00.00000
+  * Returns latitude in format N00.00000 or S00.00000
   */
   public String getLatNSDot() {
     double dec = (latitude - (Math.floor(latitude)))*100;
@@ -63,7 +64,7 @@ class Coordinate{
   }
 
   /**
-  * Returns Laotitude in format E000.00000 or W000.00000
+  * Returns longitude in format E000.00000 or W000.00000
   */
   public String getLonEWDot() {
     double dec = (longitude - (Math.floor(longitude)))*100;

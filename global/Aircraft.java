@@ -2,9 +2,10 @@ package global;
 
 import java.util.HashMap;
 
-class Aircraft {
+public class Aircraft {
+  
   String aircraft;
-  HashMap<String, String> attributes;
+  public HashMap<String, String> attributes;
 
   public Aircraft (String aircraft){
     this.aircraft = aircraft;

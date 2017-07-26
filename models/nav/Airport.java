@@ -1,14 +1,16 @@
+package modelsnav;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
-class Airport {
+public class Airport {
   String icao;
   String name;
-  ArrayList<Runway> runways;
+  private ArrayList<Runway> runways;
   HashMap<String, Coordinate> fixes;
   HashMap<String, Coordinate> gates;
-  HashMap<String, InstrumentProcedure> sids;
-  HashMap<String, InstrumentProcedure> stars;
+  HashMap<String, Procedure> sids;
+  HashMap<String, Procedure> stars;
 
   public Airport(String name, String icao) {
     this.name = name;
@@ -33,13 +35,17 @@ class Airport {
   }
   public void add(Runway runway) {
     if (runway==null) throw new IllegalArgumentException("Runway is null.");
-    runways.add(runway);
+    getRunways().add(runway);
   }
-  public void addSid(String id, InstrumentProcedure sid) {
+  public void addSid(String id, Procedure sid) {
     sids.put(id, sid);
   }
-  public void addStar(String id, InstrumentProcedure star) {
+  public void addStar(String id, Procedure star) {
     stars.put(id, star);
+  }
+
+  public ArrayList<Runway> getRunways() {
+    return runways;
   }
 
 }
