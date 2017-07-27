@@ -3,6 +3,8 @@ package modelsnav;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import modelsinterface.Waypoint;
+
 public class Airport {
   private String icao;
   String name;
@@ -54,4 +56,8 @@ public class Airport {
   }
 
 
+  public Waypoint getFix(String fixId) {
+    return new Fix(fixId, fixes.get(fixId));
+  }
+  
 }
