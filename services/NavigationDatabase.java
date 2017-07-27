@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 import modelsinterface.Waypoint;
 import modelsnav.Airport;
+import modelsnav.Fix;
 import modelsnav.Navaid;
 import modelsnav.Runway;
 
@@ -21,6 +22,7 @@ public class NavigationDatabase {
   final String PATH = "C:/Users/Dennis Chan/Desktop/boeing-fmc-display/data/";
   final int NAV_LINE_LENGTH = 61;
   final int APT_LINE_LENGTH = 74;
+  final int FIX_LINE_LENGTH = 50;
 
   private HashMap<String, Airport> airports;
   private HashMap<String, ArrayList<Waypoint>> waypoints;
@@ -30,9 +32,24 @@ public class NavigationDatabase {
     setNavaids(new HashMap<>());
     loadAirports(new File(PATH+"wpNavAPT.txt"));
     loadNavaids(new File(PATH+"wpNavAID.txt"));
+    loadFixes(new File(PATH+"wpNavFIX.txt"));
   }
 
-
+  /**
+   * Adds waypoint into waypoints object
+   * @param waypoint, a valid waypoint
+   */
+  private void addWaypoint(Waypoint waypoint){
+    String identifier = waypoint.getId();
+    if (!getWaypoints().containsKey(identifier))
+      getWaypoints().put(identifier, new ArrayList<Waypoint>());
+    
+    ArrayList<Waypoint> waypoints = getWaypoints().get(identifier);
+    waypoints.add(waypoint);
+    getWaypoints().put(identifier, waypoints);
+  }
+  
+  
   /*
       Navaids-Parsing Objects
                                 */
@@ -46,27 +63,34 @@ public class NavigationDatabase {
   private void loadNavaids(File f) throws FileNotFoundException {
     Scanner scanf = new Scanner(f);
     while (scanf.hasNext())
-      addToNavaids(scanf.nextLine());
+      createNavaid(scanf.nextLine());
     scanf.close();
   }
 
-  private void addToNavaids(String s) {
+  private void createNavaid(String s) {
     if (s.startsWith(";")) return;
-    if (s.length() != NAV_LINE_LENGTH)
-      System.out.println ("$$INVALID LINE LENGTH. "+s);
-    
-    Waypoint nav = new Navaid(s);
-    String ident = nav.getId();
-
-    if (!getWaypoints().containsKey(ident))
-      getWaypoints().put(ident, new ArrayList<Waypoint>());
-
-    ArrayList<Waypoint> ls = getWaypoints().get(ident);
-    ls.add(nav);
-    getWaypoints().put(ident, ls);
+    checkEntryLength(s, NAV_LINE_LENGTH);
+    addWaypoint(new Navaid(s));
   }
 
+  
+  /*
+      Fix-Parsing Methods
+   */
+  private void loadFixes(File f) throws FileNotFoundException{
+    Scanner scanf = new Scanner(f);
+    while (scanf.hasNextLine()) {
+      createFix(scanf.nextLine());
+    }
+  }
+  
+  private void createFix(String s) {
+    if (s.startsWith(";")) return;
+    checkEntryLength(s, FIX_LINE_LENGTH);
+    addWaypoint(new Fix(s));
+  }
 
+  
   /*
       Airport-Parsing Methods
                                 */
@@ -75,7 +99,7 @@ public class NavigationDatabase {
    * individual lines within the text file
    * @param f     file containing all airports
    * @throws FileNotFoundException
-   * @see addLineTiAirport
+   * @see addLineToAirport
    */
   private void loadAirports(File f) throws FileNotFoundException {
     Scanner scanf = new Scanner(f);
@@ -93,8 +117,7 @@ public class NavigationDatabase {
    */
   private void addAirport(String s) throws FileNotFoundException {
     if (s.startsWith(";") || s.length() != APT_LINE_LENGTH)  return;
-    if (s.length() != APT_LINE_LENGTH) // Add Logging Option
-      throw new IllegalStateException("Invalid Airport Entry: " + s);
+    checkEntryLength(s, APT_LINE_LENGTH);
 
     String icao = s.substring(24, 28); // 4 Characters-long
     if (!getAirports().containsKey(icao))
@@ -105,6 +128,10 @@ public class NavigationDatabase {
     getAirports().put(icao, airport);
   }
 
+    
+  /*
+      Setter & Getter Methods
+   */
   public HashMap<String, Airport> getAirports() {
     return airports;
   }
@@ -121,5 +148,9 @@ public class NavigationDatabase {
     this.waypoints = navaids;
   }
   
+  private void checkEntryLength(String line, int length) {
+    if (!(line.length() == length))
+      System.out.println("$$INVALID FIX LINE LENGTH" + line);
+  }
   
 }

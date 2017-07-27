@@ -24,7 +24,7 @@ public class Navaid implements Waypoint{
   }
   
   /**
-   * Constructor for PMDG wpNavAID file
+   * Constructor for creating a navaid from PMDG wpNavAID file
    * @param s, a single line from the file
    */
   public Navaid (String s) {
