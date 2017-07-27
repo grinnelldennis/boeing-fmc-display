@@ -6,42 +6,34 @@ import modelsinterface.Waypoint;
   Data structure that represents a defined aeronautical fix, containing all
    information from a single line within the FSX-PMDG navWPT file.
                                                                               */
-public class Fix implements Waypoint {
-  String id;
-  Coordinate coord;
+public class Heading implements Waypoint {
+  int heading;
 
-  public Fix(String id, String lat, String lon) {
-    this.id = id;
-    this.coord = new Coordinate(lat, lon);
+  public Heading(String heading) {
+    this(Integer.parseInt(heading));
   }
   
   /**
    * Constructor for creating a fix from PMDG wpNavFIX file
    * @param s, a single line from the file
    */
-  public Fix(String s) {
-    this(s.substring(0, s.indexOf(" ")), 
-        s.substring(30, 39), s.substring(39, 50));
-  }
-  
-  public Fix(String fixId, Coordinate coord) {
-    id = fixId;
-    this.coord = coord;
+  public Heading(int heading) {
+    this.heading = heading;
   }
   
   @Override
   public String getId() {
-    return id;
+    return ""+heading;
   }
 
   @Override
   public Coordinate getCoordinate() {
-    return coord;
+    return null;
   }
 
   @Override
   public String getInfo() {
-    return id + " " + coord.getLatNSDot() + " " + coord.getLonEWDot();
+    return "HDG " + getId();
   }
 
   @Override
@@ -51,10 +43,9 @@ public class Fix implements Waypoint {
 
   @Override
   public boolean isAVector() {
-    return false;
+    return true;
   }
 
-  
 
 
 }

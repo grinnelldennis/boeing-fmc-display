@@ -52,4 +52,14 @@ public class Navaid implements Waypoint{
   public String getInfo() {
     return id + " " + coord.getLatNSDot() + " " + coord.getLonEWDot() + " " + type + " " + freq;
   }
+  
+  @Override
+  public String toString() {
+    return getInfo();
+  }
+
+  @Override
+  public boolean isAVector() {
+    return false;
+  }
 }
