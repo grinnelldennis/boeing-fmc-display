@@ -6,19 +6,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-import modelsinterface.Waypoint;
 import modelsnav.Airport;
+import modelsnav.Coordinate;
+import modelsnav.FlightPlanWaypoint;
+import modelsnav.Procedure;
+import modelsnav.Runway;
+import modelsinterface.Waypoint;
+//Waypoint Implementations
 import modelsnav.Fix;
 import modelsnav.Navaid;
-import modelsnav.Runway;
+import modelsnav.Heading;
+import modelsnav.Track;
+import modelsnav.Intercept;
 
 /*
   NavigationDatabase.java
    Parses FSX-PMDG nav text files and create objects to represent each navigatable
    fixes as an object.
-                                                                              */
+ */
 public class NavigationDatabase {
-  //MUTABLE
   final String PATH = "C:/Users/Dennis Chan/Desktop/boeing-fmc-display/data/";
   final int NAV_LINE_LENGTH = 61;
   final int APT_LINE_LENGTH = 74;
@@ -43,16 +49,16 @@ public class NavigationDatabase {
     String identifier = waypoint.getId();
     if (!getWaypoints().containsKey(identifier))
       getWaypoints().put(identifier, new ArrayList<Waypoint>());
-    
+
     ArrayList<Waypoint> waypoints = getWaypoints().get(identifier);
     waypoints.add(waypoint);
     getWaypoints().put(identifier, waypoints);
   }
-  
-  
+
+
   /*
       Navaids-Parsing Objects
-                                */
+   */
   /**
    * Driver that iterates the entire wpNavAID file, calls addLineToNavaids with
    * individual lines within the text file
@@ -73,7 +79,7 @@ public class NavigationDatabase {
     addWaypoint(new Navaid(s));
   }
 
-  
+
   /*
       Fix-Parsing Methods
    */
@@ -83,17 +89,17 @@ public class NavigationDatabase {
       createFix(scanf.nextLine());
     }
   }
-  
+
   private void createFix(String s) {
     if (s.startsWith(";")) return;
     checkEntryLength(s, FIX_LINE_LENGTH);
     addWaypoint(new Fix(s));
   }
 
-  
+
   /*
       Airport-Parsing Methods
-                                */
+   */
   /**
    * Driver that iterates the entire wpNavAPT file, calls addLineToAriports with
    * individual lines within the text file
@@ -120,15 +126,157 @@ public class NavigationDatabase {
     checkEntryLength(s, APT_LINE_LENGTH);
 
     String icao = s.substring(24, 28); // 4 Characters-long
-    if (!getAirports().containsKey(icao))
+    if (!getAirports().containsKey(icao)) {
       getAirports().put(icao, new Airport(icao, s.substring(0, 24)));
-
+      File airportFile = new File(PATH+"SIDSTARS/"+icao+".txt");
+      if (airportFile != null)
+        loadAirport(airportFile, getAirports().get(icao));
+    }
     Airport airport = getAirports().get(icao);
     airport.getRunways().add(new Runway(s));
     getAirports().put(icao, airport);
   }
 
+  private void loadAirport(File f, Airport ap) throws FileNotFoundException {
+    Scanner scanf = new Scanner(f);
+    String s = scanf.nextLine();
+    //Get through all comments
+    while (s.startsWith("//"))
+      s = scanf.nextLine();
+    while (scanf.hasNextLine()) {
+      switch (s) {
+      case "FIXES":
+          parseFixes(scanf, ap);
+        break;
+      case "SIDS":
+        break;
+      case "STARS":
+        break;
+      case "APPROACHES":
+        break;
+      case "GATES":
+        break;
+      default:
+        //TODO: do soemthing
+        break;
+      }        
+    }    
+  }
+
+  private void parseFixes(Scanner scanf, Airport airport) {
+    String s = scanf.nextLine();
+    while (!s.equals("ENDFIXES")) {
+      if (s.startsWith("FIX")) {
+        String[] ss = s.split(" ");
+        airport.addFix(ss[1], 
+            new Coordinate(ss[3], ss[4], ss[5], ss[6], ss[7], ss[8]));
+      } else
+        logError("Invalid Fix Opening", s, "parseFixes");
+    }
+  }
+  
+  private void parseGates(Scanner scanf, Airport airport) {
+    String s = scanf.nextLine();
+    while (!s.equals("ENDGATES")) {
+      if (s.startsWith("GATE")) {
+        String[] ss = s.split(" ");
+        airport.addGate(ss[1], 
+            new Coordinate(ss[2], ss[3], ss[4], ss[5], ss[6], ss[7]));
+      } else
+        logError("Invalid Gate Opening", s, "parseGate");
+    }
+  }
+  
+  private void parseSids(Scanner scanf, Airport airport) {
+    String s = scanf.nextLine();
+    while (!s.equals("ENDSIDS")) {
+      
+    }
+  }
+  
+  /**
+   * Takes a single line of a procedure, e.g. SID or STAR, and put new 
+   *  FlightPlanWaypoints into the given procedure 
+   * @param ss, a String array starting with FIRST procedural fix
+   * @return an ArrayList of waypoints
+   */
+  private ArrayList<FlightPlanWaypoint> createRoute(String[] ss, Airport ap) {
+    ArrayList<FlightPlanWaypoint> list = new ArrayList<>();
+    FlightPlanWaypoint fpwp;
+    for (int index = 0; index < ss.length; index++) {
+      switch (ss[index]) {
+      case "FIX":
+        //may or maynot contain overfly
+        fpwp = new FlightPlanWaypoint(ap.getFix(ss[index+1]));
+        index = populateFlightPlanWaypoint(fpwp, ss, index);
+        break;
+      case "HDG":
+        fpwp = new FlightPlanWaypoint(new Heading(ss[index+1]));
+        index = populateFlightPlanWaypoint(fpwp, ss, index);
+        break;
+      case "TRK":
+        fpwp = new FlightPlanWaypoint(new Track(ss[index+1]));
+        index = populateFlightPlanWaypoint(fpwp, ss, index);
+        break;
+      case "TURN":
+        break;
+      case "INTERCEPT": //RADIAL (DEG) TO
+        fpwp = new FlightPlanWaypoint(new Intercept(ss[index+2]));
+        index = populateFlightPlanWaypoint(fpwp, ss, index);
+        break; 
+      }
+    }
+    return null;
+  }
+
+  /**
+   * 
+   * @param fpwp
+   * @param ss
+   * @param start, index of a present keyword 
+   * @return index of first un-consumed string array element
+   */
+  private int populateFlightPlanWaypoint(FlightPlanWaypoint fpwp, String[] ss, int start){
+    int index = start;
+    while (isAKeyword(ss[++index])) {
+      //iterates for potentially (numerous) restrictions
+      switch(ss[index++]) {
+      case "AT": //At or Above/Below
+        if (ss[index+=2].equals("BELOW"))
+          fpwp.setBelowAltitude(Integer.parseInt(ss[++index]));
+        else if (ss[index].equals("ABOVE"))
+          fpwp.setAboveAltitude(Integer.parseInt(ss[++index]));
+        break;
+      case "UNTIL":
+        //TODO: Until
+        break;
+      case "SPEED":
+        fpwp.setRestrictSpeed(Integer.parseInt(ss[index]));
+        break;
+      case "JUST A NUMBER":
+        //TODO: Just a number
+        break;
+      default:
+        logError("UNCAUGHT PROCEDURAL WAYPOINT PARSING", ss[index-1], "populateFlightPlanWaypoint");
+        index++;
+        break;
+      }
+    }
     
+    
+    return index - 1;
+  }
+  
+  String[] keywords = {"FIX", "HDG", "TRK", "TURN", "INTERCEPT"};
+  private boolean isAKeyword(String target) {
+    for (String key: keywords) {
+      if (target.equals(key))
+        return true;
+    }
+    return false;
+  }
+
+
   /*
       Setter & Getter Methods
    */
@@ -147,10 +295,17 @@ public class NavigationDatabase {
   public void setNavaids(HashMap<String, ArrayList<Waypoint>> navaids) {
     this.waypoints = navaids;
   }
-  
+
+  /*
+      Error & Logging Methods
+   */
   private void checkEntryLength(String line, int length) {
+    //TODO: Add file logging options
     if (!(line.length() == length))
-      System.out.println("$$INVALID FIX LINE LENGTH" + line);
+      logError("INVALID LINE LENGTH", line, "loadWaypoint");
   }
-  
+  private void logError(String error, String offendingLine, String offendingLocation) {
+    System.out.println("$$"+error+" at "+offendingLocation+ "\n  "+offendingLine);
+  }
+
 }
