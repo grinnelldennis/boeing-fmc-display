@@ -4,12 +4,16 @@ import java.util.ArrayList;
 
 import modelsinterface.Waypoint;
 import modelsnav.Airport;
+import modelsnav.Procedure;
+import modelsnav.FlightPlanWaypoint;
 
 public class FlightPlan {
-  Airport origin;  //ORGNARPT, ICAO
-  Airport destination; //DESTARPT, ICAO
-  String flightNo;  //FLTNON
-  ArrayList<Waypoint> route;
+  Airport origin; 
+  Procedure sid;
+  Procedure star;
+  Airport destination; 
+  String flightNo;  
+  ArrayList<FlightPlanWaypoint> route;
 
   public FlightPlan() {
     origin = null;
@@ -29,17 +33,17 @@ public class FlightPlan {
   }
 
   public void addWaypoint(Waypoint waypoint) {
-    route.add(waypoint);
+    route.add(new FlightPlanWaypoint(waypoint));
   }
   public void addWaypoint(Waypoint waypoint, int index) {
     if (index < route.size())
-      route.add(index, waypoint);
+      route.add(index, new FlightPlanWaypoint(waypoint));
   }
   
   public String printRoute() {
     String ret = origin.getIcao();
-    for (Waypoint wp: route) 
-      ret = ret + "-> " + wp.getId();
+    for (FlightPlanWaypoint fpwp: route) 
+      ret = ret + "-> " + fpwp.getWaypointId();
     return ret + "-> " + destination.getIcao();
   }
 
