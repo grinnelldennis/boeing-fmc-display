@@ -30,9 +30,9 @@ public class Navaid implements Waypoint{
   public Navaid (String s) {
     this(s.substring(24, s.indexOf(" ", 24)), // Identifier, 5 characters-long
         s.substring(0, 24), // Brief, 24 characters-long
-        s.substring(29, s.indexOf(" ", 29)), // Type, 4 characters-long
-        s.substring(54, 60), // Frequency, 6 characters-long
-        s.charAt(60), // 1 characters-long
+        s.substring(29, 33), // Type, 4 characters-long
+        s.substring(54, s.length()-1), // Frequency, 6 characters-long
+        s.charAt(s.length()-1),
         s.substring(33, 43), // Latitude, 10 characters-long
         s.substring(43, 54)); // Longitude, 11 characters-long
   }
