@@ -36,9 +36,11 @@ public class NavigationDatabase {
   public NavigationDatabase() throws FileNotFoundException {
     setAirports(new HashMap<>());
     setNavaids(new HashMap<>());
-    loadAirports(new File(PATH+"wpNavAPT.txt"));
     loadNavaids(new File(PATH+"wpNavAID.txt"));
+    System.out.println("$$Loaded Navaids");
     loadFixes(new File(PATH+"wpNavFIX.txt"));
+    System.out.println("$$Loaded Fixes");
+    loadAirports(new File(PATH+"wpNavAPT.txt"));
   }
 
   /**
@@ -129,7 +131,8 @@ public class NavigationDatabase {
     if (!getAirports().containsKey(icao)) {
       getAirports().put(icao, new Airport(icao, s.substring(0, 24)));
       File airportFile = new File(PATH+"SIDSTARS/"+icao+".txt");
-      if (airportFile != null)
+      System.out.println(icao);
+      if (airportFile.exists())
         loadAirport(airportFile, getAirports().get(icao));
     }
     Airport airport = getAirports().get(icao);
@@ -138,29 +141,40 @@ public class NavigationDatabase {
   }
 
   private void loadAirport(File f, Airport ap) throws FileNotFoundException {
+    System.out.println("\n$$-" + ap.getIcao());
     Scanner scanf = new Scanner(f);
     String s = scanf.nextLine();
     //Get through all comments
     while (s.startsWith("//"))
       s = scanf.nextLine();
+    System.out.println("$$-Skipped comments");
     while (scanf.hasNextLine()) {
       switch (s) {
       case "FIXES":
-          parseFixes(scanf, ap);
+        parseFixes(scanf, ap);
+        System.out.println("$$#Airport Fixes. "+ap.getFixes().size());
         break;
       case "SIDS":
+        System.out.println("SID");
         break;
       case "STARS":
+        System.out.println("STAR");
         break;
       case "APPROACHES":
+        System.out.println("APPROACH");
         break;
       case "GATES":
+        parseGates(scanf, ap);
+        System.out.println("$$-#Airport Gates. "+ap.getGates().size());
         break;
       default:
         //TODO: do soemthing
         break;
-      }        
-    }    
+      } 
+      if (scanf.hasNextLine())
+        s = scanf.nextLine();
+    }
+    System.out.println("$$parsed ");    
   }
 
   private void parseFixes(Scanner scanf, Airport airport) {
@@ -168,10 +182,15 @@ public class NavigationDatabase {
     while (!s.equals("ENDFIXES")) {
       if (s.startsWith("FIX")) {
         String[] ss = s.split(" ");
+        System.out.println("$$  FIXID. "+ss[1]);
+        if (ss.length==10)
+          for (int i = 4; i < 10; i++)
+            ss[i-1] = ss[i];
         airport.addFix(ss[1], 
             new Coordinate(ss[3], ss[4], ss[5], ss[6], ss[7], ss[8]));
       } else
         logError("Invalid Fix Opening", s, "parseFixes");
+      s = scanf.nextLine();
     }
   }
   
@@ -184,8 +203,10 @@ public class NavigationDatabase {
             new Coordinate(ss[2], ss[3], ss[4], ss[5], ss[6], ss[7]));
       } else
         logError("Invalid Gate Opening", s, "parseGate");
+      s = scanf.nextLine();
     }
   }
+  
   
   private void parseSids(Scanner scanf, Airport airport) {
     String s = scanf.nextLine();
@@ -205,20 +226,24 @@ public class NavigationDatabase {
     FlightPlanWaypoint fpwp;
     for (int index = 0; index < ss.length; index++) {
       switch (ss[index]) {
-      case "FIX":
-        //may or maynot contain overfly
+      case "FIX": //FIX {OVERFLY} (FIX) [RESTRICTIONS]
         fpwp = new FlightPlanWaypoint(ap.getFix(ss[index+1]));
         index = populateFlightPlanWaypoint(fpwp, ss, index);
         break;
-      case "HDG":
+      case "HDG": //HDG (DEG) [RESTRICTIONS]
         fpwp = new FlightPlanWaypoint(new Heading(ss[index+1]));
         index = populateFlightPlanWaypoint(fpwp, ss, index);
         break;
-      case "TRK":
+      case "TRK": //TRK (DEG) [RESTRICTIONS]
         fpwp = new FlightPlanWaypoint(new Track(ss[index+1]));
         index = populateFlightPlanWaypoint(fpwp, ss, index);
         break;
       case "TURN":
+        //TURN (DIR) DIRECT
+        break;
+      case "LEFT": //LEFT TURN INBOUNDCOURSE (DEG) LEGTIME (#)
+        break;
+      case "RIGHT": //RIGHT TURN INBOUNDCOURSE (DEG) LEGTIME (#)
         break;
       case "INTERCEPT": //RADIAL (DEG) TO
         fpwp = new FlightPlanWaypoint(new Intercept(ss[index+2]));
@@ -262,8 +287,6 @@ public class NavigationDatabase {
         break;
       }
     }
-    
-    
     return index - 1;
   }
   
@@ -305,7 +328,7 @@ public class NavigationDatabase {
       logError("INVALID LINE LENGTH", line, "loadWaypoint");
   }
   private void logError(String error, String offendingLine, String offendingLocation) {
-    System.out.println("$$"+error+" at "+offendingLocation+ "\n  "+offendingLine);
+    System.out.println("$$"+error+" at "+offendingLocation+ "\n$$  "+offendingLine);
   }
 
 }
