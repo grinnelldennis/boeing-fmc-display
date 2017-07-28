@@ -16,6 +16,8 @@ public interface Waypoint {
   public Coordinate getCoordinate();
 
   public String getInfo();
+  
+  public boolean isAVector();
 
 
 }

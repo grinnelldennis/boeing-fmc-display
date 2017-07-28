@@ -59,5 +59,25 @@ public class Airport {
   public Waypoint getFix(String fixId) {
     return new Fix(fixId, fixes.get(fixId));
   }
+
+  public String getName() {
+    return name;
+  }
+
+  public HashMap<String, Coordinate> getFixes() {
+    return fixes;
+  }
+
+  public HashMap<String, Coordinate> getGates() {
+    return gates;
+  }
+
+  public HashMap<String, Procedure> getSids() {
+    return sids;
+  }
+
+  public HashMap<String, Procedure> getStars() {
+    return stars;
+  }
   
 }
