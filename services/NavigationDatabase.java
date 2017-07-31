@@ -29,6 +29,7 @@ public class NavigationDatabase {
   final int NAV_LINE_LENGTH = 61;
   final int APT_LINE_LENGTH = 74;
   final int FIX_LINE_LENGTH = 50;
+  final boolean DEBUG = true;
 
   private HashMap<String, Airport> airports;
   private HashMap<String, ArrayList<Waypoint>> waypoints;
@@ -37,9 +38,9 @@ public class NavigationDatabase {
     setAirports(new HashMap<>());
     setNavaids(new HashMap<>());
     loadNavaids(new File(PATH+"wpNavAID.txt"));
-    System.out.println("$$Loaded Navaids");
+    if (DEBUG) System.out.println("$$Loaded Navaids");
     loadFixes(new File(PATH+"wpNavFIX.txt"));
-    System.out.println("$$Loaded Fixes");
+    if (DEBUG) System.out.println("$$Loaded Fixes");
     loadAirports(new File(PATH+"wpNavAPT.txt"));
   }
 
@@ -118,7 +119,7 @@ public class NavigationDatabase {
   /**
    * Parses a line of the airport text file containing a single runway information
    * and extract the runway information, creates mapping airport object the key
-   * (airport icao) does not already exist in hashtable; otherwise adds the runway
+   * (Airport ICAO) does not already exist in hashtable; otherwise adds the runway
    * to the hashtable.
    * @param s   text from airports database, contains one runway info for airport
    * @throws FileNotFoundException
@@ -130,7 +131,7 @@ public class NavigationDatabase {
     String icao = s.substring(24, 28); // 4 Characters-long
     if (!getAirports().containsKey(icao)) {
       getAirports().put(icao, new Airport(icao, s.substring(0, 24)));
-      File airportFile = new File(PATH+"SIDSTARS/"+icao+".txt");
+      File airportFile = new File(PATH+""+icao+".txt");
       System.out.println(icao);
       if (airportFile.exists())
         loadAirport(airportFile, getAirports().get(icao));
@@ -155,12 +156,13 @@ public class NavigationDatabase {
         System.out.println("$$#Airport Fixes. "+ap.getFixes().size());
         break;
       case "SIDS":
-        System.out.println("SID");
+        parseProcedures(scanf, ap, "SID");
         break;
       case "STARS":
-        System.out.println("STAR");
+        parseProcedures(scanf, ap, "STAR");
         break;
       case "APPROACHES":
+        //" TRANSITION"
         System.out.println("APPROACH");
         break;
       case "GATES":
@@ -176,6 +178,45 @@ public class NavigationDatabase {
     }
     System.out.println("$$parsed ");    
   }
+
+  /**
+   * Consumes lines within a typed block, i.e. block starting from line 
+   *  immediately after "SIDS" to the line "ENDSIDS," inclusive.
+   * @param scanf, an object scanning a single airport file 
+   * @param airport, airport object for passing for creating procedure
+   * @param type, either SID or STAR
+   */
+  private void parseProcedures(Scanner scanf, Airport airport, String type) {
+    String s = scanf.nextLine();
+    Procedure procedure = null;
+    String procedureId = null;
+    while (!s.equals("END"+type)) {
+      if (s.startsWith(type)) {
+        String[] ss = s.split(" ");
+        procedureId = ss[1];
+        procedure = new Procedure(procedureId, type);
+        procedure.setBaseProcedure(createProceduralRoute(ss, airport, 2));
+        s = scanf.nextLine();
+        while (!s.startsWith(type)) {
+          ss = s.split(" ");
+          if (s.startsWith(" RNW")) 
+            procedure.addRunwayProcedure(ss[2], createProceduralRoute(ss, airport, 3));
+          else if (s.startsWith("  RNW"))
+            procedure.addRunwayProcedure(ss[3], createProceduralRoute(ss, airport, 4));
+          else if (s.startsWith(" TRANSITION")) 
+              procedure.addTransition(ss[2], createProceduralRoute(ss, airport, 3));
+          else if (s.startsWith("  TRANSITION")) 
+            procedure.addTransition(ss[3], createProceduralRoute(ss, airport, 4));
+          s = scanf.nextLine();
+        }
+      }
+      if (type.equals("SID"))
+        airport.addSid(procedureId, procedure);
+      else if (type.equals("STAR"))
+        airport.addStar(procedureId, procedure);
+    }
+  }
+
 
   private void parseFixes(Scanner scanf, Airport airport) {
     String s = scanf.nextLine();
@@ -193,7 +234,7 @@ public class NavigationDatabase {
       s = scanf.nextLine();
     }
   }
-  
+
   private void parseGates(Scanner scanf, Airport airport) {
     String s = scanf.nextLine();
     while (!s.equals("ENDGATES")) {
@@ -206,25 +247,20 @@ public class NavigationDatabase {
       s = scanf.nextLine();
     }
   }
-  
-  
-  private void parseSids(Scanner scanf, Airport airport) {
-    String s = scanf.nextLine();
-    while (!s.equals("ENDSIDS")) {
-      
-    }
-  }
-  
+
+
   /**
    * Takes a single line of a procedure, e.g. SID or STAR, and put new 
    *  FlightPlanWaypoints into the given procedure 
    * @param ss, a String array starting with FIRST procedural fix
+   * @param ap, an airport object to get fixes from
+   * @param st, a starting index for parsing ss
    * @return an ArrayList of waypoints
    */
-  private ArrayList<FlightPlanWaypoint> createRoute(String[] ss, Airport ap) {
+  private ArrayList<FlightPlanWaypoint> createProceduralRoute(String[] ss, Airport ap, int st) {
     ArrayList<FlightPlanWaypoint> list = new ArrayList<>();
     FlightPlanWaypoint fpwp;
-    for (int index = 0; index < ss.length; index++) {
+    for (int index = st; index < ss.length; index++) {
       switch (ss[index]) {
       case "FIX": //FIX {OVERFLY} (FIX) [RESTRICTIONS]
         fpwp = new FlightPlanWaypoint(ap.getFix(ss[index+1]));
@@ -289,7 +325,7 @@ public class NavigationDatabase {
     }
     return index - 1;
   }
-  
+
   String[] keywords = {"FIX", "HDG", "TRK", "TURN", "INTERCEPT"};
   private boolean isAKeyword(String target) {
     for (String key: keywords) {
