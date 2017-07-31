@@ -22,6 +22,42 @@ public class Procedure {
     transitions = new HashMap<>();
   }
 
+  public String getId() {
+    return id;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public ArrayList<FlightPlanWaypoint> getBaseProcedure() {
+    return baseProcedure;
+  }
+
+  public HashMap<String, ArrayList<FlightPlanWaypoint>> getRunwayProcedures() {
+    return runwayProcedures;
+  }
+
+  public HashMap<String, ArrayList<FlightPlanWaypoint>> getTransitions() {
+    return transitions;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public void setRunwayProcedures(HashMap<String, ArrayList<FlightPlanWaypoint>> runwayProcedures) {
+    this.runwayProcedures = runwayProcedures;
+  }
+
+  public void setTransitions(HashMap<String, ArrayList<FlightPlanWaypoint>> transitions) {
+    this.transitions = transitions;
+  }
+
   public void setBaseProcedure(ArrayList<FlightPlanWaypoint> proc) {
     this.baseProcedure = proc;
   }
@@ -44,6 +80,8 @@ public class Procedure {
   public void addTransition(String id, ArrayList<FlightPlanWaypoint> transition) {
     this.transitions.put(id, transition);
   }
+ 
+  
   
 
 }

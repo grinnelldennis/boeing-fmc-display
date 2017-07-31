@@ -47,6 +47,34 @@ public class Airport {
     stars.put(id, star);
   }
 
+  public void setIcao(String icao) {
+    this.icao = icao;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setRunways(ArrayList<Runway> runways) {
+    this.runways = runways;
+  }
+
+  public void setFixes(HashMap<String, Coordinate> fixes) {
+    this.fixes = fixes;
+  }
+
+  public void setGates(HashMap<String, Coordinate> gates) {
+    this.gates = gates;
+  }
+
+  public void setSids(HashMap<String, Procedure> sids) {
+    this.sids = sids;
+  }
+
+  public void setStars(HashMap<String, Procedure> stars) {
+    this.stars = stars;
+  }
+
   public ArrayList<Runway> getRunways() {
     return runways;
   }
