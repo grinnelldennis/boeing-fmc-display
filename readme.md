@@ -1,6 +1,6 @@
-##Boeing-FMC-Display Project
+## Boeing-FMC-Display Project
 
-####Revised Program Flow To-Be-Implemented for Next Update
+#### Revised Program Flow To-Be-Implemented for Next Update
 
 `static Main`
       |--Load dependencies, initializing:
@@ -12,11 +12,11 @@
 |  --<|--`takeInput()`
 -----<|   -Update corresponding Objects if input is valid
 
-#####Objectives of Revision:
+##### Objectives of Revision:
 -Reduce dependencies between layers of program
 
 
-###Project Organization
+### Project Organization
 Brief explanation of the program's mechanics, and a description of relationships between files
 ####Mechanics
 
