@@ -1,18 +1,18 @@
 # FMC-Display
 This is an experimental project aimed to explore the potential for an easily adaptable and portable Flight Management Computer (FMC) for flight simulation as a mean of flight tracking.
 
-### Pending Revision to Program Flow
+## Pending Revision to Program Flow
 
 ```
-`static Main`
+static Main
       |--Load dependencies, initializing:
-      |   -Global variables, e.g. `Aircraft, World, Navigation`
-      |   -Database, e.g. `Airport, Procedure, Navaids`
-      |
------>|--`screen.render()`
-|  |  |
-|  --<|--`takeInput()`
------<|   -Update corresponding Objects if input is valid
+      |   -Global variables, e.g. Aircraft, World, Navigation
+      |   -Database, e.g. Airport, Procedure, Navaids
+              |
+      |--screen.render()  <------------------------------------
+              |                                               |
+      |--takeInput()                                          |
+      |   -Update corresponding Objects if input is valid  >---
 ```
 
 #### Objectives of Revision:
@@ -21,17 +21,30 @@ This is an experimental project aimed to explore the potential for an easily ada
 
 ## Current Project Organization
 Brief explanation of the program's mechanics, and a description of relationships between files
+```
+        |      Parsing
+        |         v
+        |  Representation <----
+   Data |         v           |
+        | User-Interaction    |
+        |         v           |
+        |   Manipulation >-----
+
+```
+The program draws upon tens of thousand lines of text-file data. All the data are put into appropriate data structures in order to store the information, as well as meaningfully and accurately model the relationship between the data for retrieval. The program then responds to user input in order to make the information stored meaningful, e.g. calculating aircraft performance under altitude restrictions.
+
+
 ### Mechanics
 
 
 ### Interfaces
 `Waypoint`,
-Implemented by:
--`Fix`, a defined aeronautical waypoint containing an `id`, and a `coordinate`
--`Navaid`, a defined waypoint of a ground-based navigatable station
--`Intercept`, a non-geographical waypoint that specifies a interception patah
--`Track`, a non-geographical waypoint specifies a numerical degree track
--`Vectors`, a non-geographical waypoint that specifies a numerical degree heading
+####Implemented by:
+- `Fix`, a defined aeronautical waypoint containing an `id`, and a `coordinate`
+- `Navaid`, a defined waypoint of a ground-based navigatable station
+- `Intercept`, a non-geographical waypoint that specifies a interception patah
+- `Track`, a non-geographical waypoint specifies a numerical degree track
+- `Vectors`, a non-geographical waypoint that specifies a numerical degree heading
 
 
 ### Classes, Non-Implementing
@@ -39,8 +52,8 @@ Implemented by:
 
 `Airport`, a container object that encapsulates the features of an airport in terms of instrument procedures and geographical information.
 Uses:
--`Runway`
--`Procedure`
+- `Runway`
+- `Procedure`
 
 `FlightPlanWaypoint`, a waypoint used exclusively for FMC's navigational planning capabilities;
 `ProcedureWaypoint`,
@@ -56,6 +69,7 @@ Section to keep ideas organized and myself sane!
 
 
 ### Sample text-doc for Static Text Setup
+```
 ;ident page
 SPACE 10 IDENT SPACE 9
 SPACE 1 MODEL SPACE 8 ENG SPACE 1 RATING
@@ -75,7 +89,7 @@ AC-MODEL,AIRCRAFT MODEL,READ-ONCE,STRING,10,LEFT
 AC-ENGRAT,ENGINE RATING,READ-ONCE,STRING,12,RIGHT
 NV-DCYCLE,NAVIGATION DATA,READ-ONCE,STRING,10,LEFT
 NV-DEFF,NAV DATA EFFECTIVE DATE,READ-ONCE,STRING,13,RIGHT
-
+```
 
 
 
@@ -86,12 +100,12 @@ NV-DEFF,NAV DATA EFFECTIVE DATE,READ-ONCE,STRING,13,RIGHT
 `ROUTE 1 UPLINK READY`
 
 ### Design
--click on side button, returns position
+- click on side button, returns position
 
 ## Miscellaneous
--load preset with formatting strings
--placeholder
--loading
+- load preset with formatting strings
+- placeholder
+- loading
 
 
 ## Screens Mock Ups
@@ -103,6 +117,7 @@ Placeholder Texts::  ▯▯
 ```
 
 ### Aircraft & Nav Ident Page
+```
 __________________________
 |          IDENT         |
 | MODEL        ENG RATING|      -click on side button, returns position
@@ -275,6 +290,7 @@ __________________________
 |------------------------|
 |<INDEX          TAKEOFF>|
 |________________________|
+```
 
 
 
@@ -287,10 +303,9 @@ __________________________
 
 
 
+#### UPLINK
 
---------UPLINK-------------
-
-
+```
 PREF INIT
 __________________________
 |       PREF INIT        |
@@ -307,3 +322,4 @@ __________________________
 |------------------------|
 |<INDEX       THRUST LIM>|
 |PREF INIT UPLINK________|
+```
