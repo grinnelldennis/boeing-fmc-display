@@ -1,6 +1,7 @@
-## Boeing-FMC-Display Project
+# FMC-Display
+This is an experimental project aimed to explore the potential for an easily adaptable and portable Flight Management Computer (FMC) for flight simulation as a mean of flight tracking.
 
-#### Revised Program Flow To-Be-Implemented for Next Update
+### Pending Revision to Program Flow
 
 `static Main`
       |--Load dependencies, initializing:
@@ -12,16 +13,16 @@
 |  --<|--`takeInput()`
 -----<|   -Update corresponding Objects if input is valid
 
-##### Objectives of Revision:
+#### Objectives of Revision:
 -Reduce dependencies between layers of program
 
 
 ### Project Organization
 Brief explanation of the program's mechanics, and a description of relationships between files
-####Mechanics
+#### Mechanics
 
 
-####Interfaces
+#### Interfaces
 `Waypoint`,
 Implemented by:
 -`Fix`, a defined aeronautical waypoint containing an `id`, and a `coordinate`
@@ -31,7 +32,7 @@ Implemented by:
 -`Vectors`, a non-geographical waypoint that specifies a numerical degree heading
 
 
-####Classes, Non-Implementing
+#### Classes, Non-Implementing
 `NavigationDatabase`
 
 `Airport`, a container object that encapsulates the features of an airport in terms of instrument procedures and geographical information.
@@ -41,18 +42,18 @@ Uses:
 
 `FlightPlanWaypoint`, a waypoint used exclusively for FMC's navigational planning capabilities;
 `ProcedureWaypoint`,
-#####Atomic
+##### Atomic Classes
 `Coordinate`
 
 
 
 
-###Notes to Self
+### Notes to Self
 Section to keep ideas organized and myself sane!
-####Ideas
+#### Ideas
 
 
-####Sample text-doc for Static Text Setup
+#### Sample text-doc for Static Text Setup
 ;ident page
 SPACE 10 IDENT SPACE 9
 SPACE 1 MODEL SPACE 8 ENG SPACE 1 RATING
@@ -76,22 +77,22 @@ NV-DEFF,NAV DATA EFFECTIVE DATE,READ-ONCE,STRING,13,RIGHT
 
 
 
-###Features to Implement
+### Features to Implement
 
-####Dynamic Warning Messages
+#### Dynamic Warning Messages
 `NAV DATA OUT OF DATE`
 `ROUTE 1 UPLINK READY`
 
-####Design
+#### Design
 -click on side button, returns position
 
-###Miscellaneous
+### Miscellaneous
 -load preset with formatting strings
 -placeholder
 -loading
 
 
-###Screens Mock Ups
+### Screens Mock Ups
 
 ```
 Conventions:
@@ -99,7 +100,7 @@ Load from Objects::  XX (CHAR) OR ## (NUM)
 Placeholder Texts::  ▯▯
 ```
 
-#####Aircraft & Nav Ident Page
+##### Aircraft & Nav Ident Page
 __________________________
 |          IDENT         |
 | MODEL        ENG RATING|      -click on side button, returns position
