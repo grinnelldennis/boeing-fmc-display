@@ -2,8 +2,7 @@ package services;
 
 import java.util.HashMap;
 
-import global.Aircraft;
-import global.Navigation;
+import global.StaticData;
 import global.World;
 import modelsinterface.Field;
 import modelsfmc.Fields;
@@ -18,21 +17,17 @@ import modelsnav.Airport;
 
 public class DataInterface {
 
-  Aircraft ac;
-  Navigation nv;
-  World wr;
+  StaticData sd;
   NavigationDatabase nd;
   FlightPlan fp;
   //SCREEN INPUT/OUTPUT
   char[][] screen;
   HashMap<String, Field> fields;
 
-  public DataInterface(Aircraft ac, Navigation nv, World wr, 
+  public DataInterface(StaticData sd, World wr, 
       NavigationDatabase nd, FlightPlan fp) {
     screen = new char[14][24];
-    this.ac = ac;
-    this.nv = nv;
-    this.wr = wr;
+    this.sd = sd;
     this.nd = nd;
     this.fp = fp;
   }
@@ -172,12 +167,12 @@ public class DataInterface {
    *  Object Read-Only Methods 
    *                              */
   public String getStaticValueFor(String key) {
-    if (key.startsWith("AC-") && ac.attributes.containsKey(key))
-      return ac.attributes.get(key);
-    else if (key.startsWith("NV-") && nv.attributes.containsKey(key))
-      return nv.attributes.get(key);
-    else if (key.startsWith("WR-") && wr.attributes.containsKey(key))
-      return wr.attributes.get(key);
+    if (key.startsWith("AC-"))
+      return sd.get("ac", key);
+    else if (key.startsWith("NV-"))
+      return sd.get("nv", key);
+    else if (key.startsWith("WR-"))
+      return sd.get("wr", key);
     else
       return "-ERR";
   }
