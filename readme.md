@@ -1,22 +1,40 @@
 # FMC-Display
 This is an experimental project aimed to explore the potential for an easily adaptable and portable Flight Management Computer (FMC) for flight simulation as a mean of flight tracking.
 
-## Pending Revision to Program Flow
+## Pending Updates
+
+- Overhaul current Page system to field-based
+  - removes dependence on array structure
+  - models field as an object
+    - allows more information carrying
+- Formalize classes that implement Waypoint interface
+- Enforce strict adherence to Single-Responsibility Principle
+
+### TODOs
+
+- Finalize screen-field lookup-table prototype
+- Parser for reading screen-field data files
+- Localize 2d array to `Screen` object & remove from `DataInterface`
+- Replace data keeping in 2d-array using `Fields` object
+- Implement "just-in-time" 2d-array rendering
+- All input result in change in `Fields`
+- Consistent passing of `Fields` into `Screen`
+
+### Revision to Program Flow
 
 ```
 static Main
-      |--Load dependencies, initializing:
-      |   -Global variables, e.g. Aircraft, World, Navigation
-      |   -Database, e.g. Airport, Procedure, Navaids
+         Load dependencies, initializing:
+          -Global variables, e.g. Aircraft, World, Navigation
+          -Database, e.g. Airport, Procedure, Navaids
               |
-      |--screen.render()  <------------------------------------
+         screen.render()  <------------------------------------
               |                                               |
-      |--takeInput()                                          |
-      |   -Update corresponding Objects if input is valid  >---
+         takeInput()                                          |
+          -Update corresponding Objects if input is valid  >---
 ```
 
-#### Objectives of Revision:
--Reduce dependencies between layers of program
+Objectives of Revision: Reduce dependencies between layers of program
 
 
 ## Current Project Organization
@@ -31,7 +49,7 @@ Brief explanation of the program's mechanics, and a description of relationships
         |   Manipulation >-----
 
 ```
-The program draws upon tens of thousand lines of text-file data. All the data are put into appropriate data structures in order to store the information, as well as meaningfully and accurately model the relationship between the data for retrieval. The program then responds to user input in order to make the information stored meaningful, e.g. calculating aircraft performance under altitude restrictions.
+The program draws upon tens of thousand lines of text-file data. Data is put into appropriate data structures in order to store the information, as well as meaningfully and accurately model the relationship between the data for retrieval. The program then responds to user input in order to make the information stored meaningful, e.g. calculating aircraft performance under altitude restrictions.
 
 
 ### Mechanics
@@ -39,7 +57,7 @@ The program draws upon tens of thousand lines of text-file data. All the data ar
 
 ### Interfaces
 `Waypoint`,
-####Implemented by:
+#### Implemented by:
 - `Fix`, a defined aeronautical waypoint containing an `id`, and a `coordinate`
 - `Navaid`, a defined waypoint of a ground-based navigatable station
 - `Intercept`, a non-geographical waypoint that specifies a interception patah
@@ -60,6 +78,12 @@ Uses:
 ##### Atomic Classes
 `Coordinate`
 
+
+### External Classes
+These classes are not directly modified by the FMC and taken as givens. For example, the present time and date.
+- `World`
+- `Aircraft`
+- `Navigation`
 
 
 
@@ -120,7 +144,7 @@ Placeholder Texts::  ▯▯
 ```
 __________________________
 |          IDENT         |
-| MODEL        ENG RATING|      -click on side button, returns position
+| MODEL        ENG RATING|
 |XXXXXXXXXX  XXXXXXXXXXXX|
 | NAV DATA         ACTIVE|
 |AIRAC-1601 JAN07FEB03/16|
